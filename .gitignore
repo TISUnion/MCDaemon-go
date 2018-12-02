@@ -16,3 +16,5 @@ logs
 minecraft
 eula.txt
 server.properties
+world
+*.json

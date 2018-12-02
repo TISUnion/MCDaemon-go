@@ -1,22 +1,61 @@
 package main
 
 import (
+	"MCDaemon-go/config"
+	"bufio"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os/exec"
 )
 
+var (
+	MCDconfig   map[string]string
+	commandArgu []string
+)
+
+func getres(bufReader *bufio.Reader) {
+	var buffer []byte = make([]byte, 4096)
+	for {
+		n, err := bufReader.Read(buffer)
+		if err != nil {
+			if err == io.EOF {
+				fmt.Printf("pipi has Closed\n")
+			} else {
+				fmt.Println("Read content failed")
+			}
+			break
+		}
+		fmt.Printf("%s\n\n", string(buffer[:n]))
+	}
+}
+
+func init() {
+	MCDconfig = config.GetConfig()
+	commandArgu = []string{
+		MCDconfig["Xmx"],
+		MCDconfig["Xms"],
+		"-jar",
+		fmt.Sprintf("%s/%s", MCDconfig["serverPath"], MCDconfig["serverName"]),
+	}
+	if MCDconfig["gui"] != "true" {
+		commandArgu = append(commandArgu, "nogui")
+	}
+}
+
 func main() {
-	cmd := exec.Command("java", "-Xmx1024M", "-Xms1024M", "-jar", "minecraft/server.jar", "nogui")
+
+	cmd := exec.Command("java", commandArgu...)
 	stdout, err := cmd.StdoutPipe()
+	bufReader := bufio.NewReader(stdout)
 	if err != nil {
 		log.Fatal(err)
 	}
+	go getres(bufReader)
 	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
 	}
 	defer stdout.Close()
-	res, _ := ioutil.ReadAll(stdout)
-	fmt.Println(string(res))
+	defer cmd.Process.Kill()
+	cmd.Wait()
 }
