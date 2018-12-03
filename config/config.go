@@ -9,14 +9,8 @@ import (
 
 //配置变量
 var (
-	serverName string
-	serverPath string
-	xms        string
-	xmx        string
-	gui        string
-	plugins    map[string]string
-	cfg        *ini.File
-	err        error
+	cfg *ini.File
+	err error
 )
 
 func GetConfig() map[string]string {
@@ -28,22 +22,22 @@ func GetConfig() map[string]string {
 	}
 	//读取配置
 	Section := cfg.Section("MCDeamon")
-	serverName = Section.Key("server_name").String()
-	serverPath = Section.Key("server_path").String()
+	serverName := Section.Key("server_name").String()
+	serverPath := Section.Key("server_path").String()
 	//设置默认值
-	xms = Section.Key("Xms").Validate(func(in string) string {
+	xms := Section.Key("Xms").Validate(func(in string) string {
 		if len(in) == 0 {
 			return "-Xms1024M"
 		}
 		return fmt.Sprint("-Xms", in)
 	})
-	xmx = Section.Key("Xmx").Validate(func(in string) string {
+	xmx := Section.Key("Xmx").Validate(func(in string) string {
 		if len(in) == 0 {
 			return "-Xmx1024M"
 		}
 		return fmt.Sprint("-Xmx", in)
 	})
-	gui = Section.Key("gui").Validate(func(in string) string {
+	gui := Section.Key("gui").Validate(func(in string) string {
 		if len(in) == 0 {
 			return "false"
 		}
@@ -73,6 +67,19 @@ func SetEula() {
 	}
 }
 
-// func GetPlugins() map[string]string {
-// 	cfg, err = ini.Load("MCD_conig.ini")
-// }
+func GetPlugins() (map[string]string, map[string]string) {
+	cfg, err = ini.Load("MCD_conig.ini")
+	userPlugins := make(map[string]string)
+	serverPlugins := make(map[string]string)
+
+	keys := cfg.Section("user_plugins").KeyStrings()
+	for _, val := range keys {
+		userPlugins[val] = cfg.Section("user_plugins").Key(val).String()
+	}
+
+	keys = cfg.Section("server_plugins").KeyStrings()
+	for _, val := range keys {
+		serverPlugins[val] = cfg.Section("server_plugins").Key(val).String()
+	}
+	return userPlugins, serverPlugins
+}
