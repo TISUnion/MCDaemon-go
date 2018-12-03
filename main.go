@@ -31,6 +31,10 @@ func getres(bufReader *bufio.Reader) {
 }
 
 func init() {
+	//判断eula是否为真
+	config.SetEula()
+
+	//加载服务器启动配置
 	MCDconfig = config.GetConfig()
 	commandArgu = []string{
 		MCDconfig["Xmx"],
