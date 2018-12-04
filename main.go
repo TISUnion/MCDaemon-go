@@ -2,53 +2,23 @@ package main
 
 import (
 	"MCDaemon-go/config"
+	"MCDaemon-go/server"
 	"fmt"
 )
 
 var (
-	commandArgv []string
+	commandArgv []string //服务器启动参数
+	svr         *server.Server
+	conf        *config.Config
 )
-
-//监听输出管道
-// func listen(bufReader *bufio.Reader) {
-// 	var buffer []byte = make([]byte, 4096)
-// 	for {
-// 		n, err := bufReader.Read(buffer)
-// 		if err != nil {
-// 			if err == io.EOF {
-// 				fmt.Printf("pipi has Closed\n")
-// 			} else {
-// 				fmt.Println("Read content failed")
-// 			}
-// 			break
-// 		}
-// 		fmt.Printf("%s\n\n", string(buffer[:n]))
-// 	}
-// }
-
-//开启服务器,并等待加载地图完成
-func start() {
-	// cmd := exec.Command("java", commandArgv...)
-	// stdout, err := cmd.StdoutPipe()
-	// bufReader := bufio.NewReader(stdout)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// // go getres(bufReader)
-	// if err := cmd.Start(); err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer stdout.Close()
-	// defer cmd.Process.Kill()
-	// cmd.Wait()
-}
 
 func init() {
 	//判断eula是否为真
 	config.SetEula()
-
+	//获取conig实例
+	conf = config.GetInstance()
 	//加载服务器启动配置
-	MCDconfig := config.GetConfig()
+	MCDconfig := conf.GetConfig()
 	commandArgv = []string{
 		MCDconfig["Xmx"],
 		MCDconfig["Xms"],
@@ -61,5 +31,13 @@ func init() {
 }
 
 func main() {
-
+	// 创建服务器实例并启动
+	svr = server.GetServerInstance()
+	//初始化服务器
+	svr.Init(commandArgv)
+	// 等待地图加载
+	svr.WaitEndLoading()
+	// 运行MCD
+	svr.Run()
+	defer svr.Close()
 }
