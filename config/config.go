@@ -1,90 +1,75 @@
 package config
 
 import (
-	"MCDaemon-go/lib"
 	"fmt"
 	"os"
 
 	"github.com/go-ini/ini"
 )
 
-type Config struct {
-	Conf    map[string]string
-	Plugins map[string]lib.HotPlugin
-}
-
 //配置变量
 var (
-	cfg      *ini.File
-	err      error
-	is_build bool
-	conf     *Config
+	cfg     *ini.File
+	err     error
+	plugins map[string]string
 )
 
-func (c *Config) GetStartConfig() map[string]string {
-	if c.Conf == nil {
-		//加载配置文件
-		cfg, err = ini.Load("MCD_conig.ini")
-		if err != nil {
-			fmt.Printf("Fail to read file: %v", err)
-			os.Exit(1)
-		}
-		//读取配置
-		Section := cfg.Section("MCDeamon")
-		serverName := Section.Key("server_name").String()
-		serverPath := Section.Key("server_path").String()
-		//设置默认值
-		xms := Section.Key("Xms").Validate(func(in string) string {
-			if len(in) == 0 {
-				return "-Xms1024M"
-			}
-			return fmt.Sprint("-Xms", in)
-		})
-		xmx := Section.Key("Xmx").Validate(func(in string) string {
-			if len(in) == 0 {
-				return "-Xmx1024M"
-			}
-			return fmt.Sprint("-Xmx", in)
-		})
-		gui := Section.Key("gui").Validate(func(in string) string {
-			if len(in) == 0 {
-				return "false"
-			}
-			return in
-		})
-		c.Conf = map[string]string{
-			"serverName": serverName,
-			"serverPath": serverPath,
-			"Xmx":        xmx,
-			"Xms":        xms,
-			"gui":        gui,
-		}
+//获取服务器启动配置
+func GetStartConfig() map[string]string {
+	//加载配置文件
+	cfg, err = ini.Load("MCD_conig.ini")
+	if err != nil {
+		fmt.Printf("Fail to read file: %v", err)
+		os.Exit(1)
 	}
-	return c.Conf
-}
-
-func (c *Config) GetPlugins() map[string]lib.HotPlugin {
-	if c.Plugins == nil {
-		cfg, _ = ini.Load("MCD_conig.ini")
-		plugins := make(map[string]lib.HotPlugin)
-		keys := cfg.Section("plugins").KeyStrings()
-		for _, val := range keys {
-			plugins[val] = lib.HotPlugin(cfg.Section("plugins").Key(val).String())
+	//读取配置
+	Section := cfg.Section("MCDeamon")
+	serverName := Section.Key("server_name").String()
+	serverPath := Section.Key("server_path").String()
+	//设置默认值
+	xms := Section.Key("Xms").Validate(func(in string) string {
+		if len(in) == 0 {
+			return "-Xms1024M"
 		}
-		c.Plugins = plugins
-	}
-	return c.Plugins
-}
-
-func GetInstance() *Config {
-	if !is_build {
-		conf = &Config{}
+		return fmt.Sprint("-Xms", in)
+	})
+	xmx := Section.Key("Xmx").Validate(func(in string) string {
+		if len(in) == 0 {
+			return "-Xmx1024M"
+		}
+		return fmt.Sprint("-Xmx", in)
+	})
+	gui := Section.Key("gui").Validate(func(in string) string {
+		if len(in) == 0 {
+			return "false"
+		}
+		return in
+	})
+	conf := map[string]string{
+		"serverName": serverName,
+		"serverPath": serverPath,
+		"Xmx":        xmx,
+		"Xms":        xms,
+		"gui":        gui,
 	}
 	return conf
 }
 
-func init() {
-	is_build = false
+//获取插件配置
+func GetPlugins(is_rebuild bool) map[string]string {
+	if is_rebuild || plugins == nil {
+		cfg, _ = ini.Load("MCD_conig.ini")
+		plugins := make(map[string]string)
+		keys := cfg.Section("plugins").KeyStrings()
+		for _, val := range keys {
+			plugins[val] = cfg.Section("plugins").Key(val).String()
+		}
+	}
+	return plugins
+}
+
+func GetPluginName(cmd string) string {
+	return ""
 }
 
 func SetEula() {
