@@ -1,6 +1,8 @@
 package server
 
 import (
+	parser "MCDaemon-go/parsers"
+	plugin "MCDaemon-go/plugins"
 	"fmt"
 	"io"
 	"log"
@@ -36,7 +38,6 @@ func (svr *Server) WaitEndLoading() {
 func (svr *Server) Run() {
 	var buffer []byte = make([]byte, 4096)
 	var retStr string
-	// cl := command.GetInstance()
 	for {
 		n, err := svr.Stdout.Read(buffer)
 		if err != nil {
@@ -49,14 +50,11 @@ func (svr *Server) Run() {
 		}
 		retStr = string(buffer[:n])
 		fmt.Println(retStr)
-		// for _, val := range ParseMachineList {
-		// 	_command, ok := val.Parsing(retStr)
-		// 	//如果是命令,加入待执行列表
-		// 	if ok {
-		// 		if isFall := cl.Push(_command); isFall {
-		// 			//待处理命令列表已满
-		// 		}
-		// 	}
-		// }
+		for _, val := range parser.ParseList {
+			command, ok := val.Parsing(retStr)
+			if ok {
+				plugin.PluginsList[command.Cmd].Handle(command, svr)
+			}
+		}
 	}
 }

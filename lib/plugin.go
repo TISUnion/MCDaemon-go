@@ -1,7 +1,7 @@
 package lib
 
-import "reloadMCDaemon-go/command"
+import "MCDaemon-go/command"
 
-type plugin interface {
-	Handle(*command.Command, *Server)
+type Plugin interface {
+	Handle(*command.Command, Server)
 }

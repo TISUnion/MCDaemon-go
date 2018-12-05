@@ -1,7 +1,7 @@
 package lib
 
-import "reloadMCDaemon-go/command"
+import "MCDaemon-go/command"
 
-type ParseMachine interface {
+type Parser interface {
 	Parsing(string) (*command.Command, bool)
 }
