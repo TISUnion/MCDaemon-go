@@ -3,10 +3,10 @@
  */
 package parse
 
-import "MCDaemon-go/command"
+import "MCDaemon-go/lib"
 
 type ParseMachine interface {
-	Parsing(string) (*command.Command, bool)
+	Parsing(string) (*lib.Command, bool)
 }
 
 //语法解析器队列

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"MCDaemon-go/lib"
 	"fmt"
 	"os"
 
@@ -9,7 +10,7 @@ import (
 
 type Config struct {
 	Conf    map[string]string
-	Plugins map[string]string
+	Plugins map[string]lib.HotPlugin
 }
 
 //配置变量
@@ -20,7 +21,7 @@ var (
 	conf     *Config
 )
 
-func (c *Config) GetConfig() map[string]string {
+func (c *Config) GetStartConfig() map[string]string {
 	if c.Conf == nil {
 		//加载配置文件
 		cfg, err = ini.Load("MCD_conig.ini")
@@ -62,13 +63,13 @@ func (c *Config) GetConfig() map[string]string {
 	return c.Conf
 }
 
-func (c *Config) GetPlugins() map[string]string {
+func (c *Config) GetPlugins() map[string]lib.HotPlugin {
 	if c.Plugins == nil {
-		cfg, err = ini.Load("MCD_conig.ini")
-		plugins := make(map[string]string)
+		cfg, _ = ini.Load("MCD_conig.ini")
+		plugins := make(map[string]lib.HotPlugin)
 		keys := cfg.Section("plugins").KeyStrings()
 		for _, val := range keys {
-			plugins[val] = cfg.Section("plugins").Key(val).String()
+			plugins[val] = lib.HotPlugin(cfg.Section("plugins").Key(val).String())
 		}
 		c.Plugins = plugins
 	}

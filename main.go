@@ -18,7 +18,7 @@ func init() {
 	//获取conig实例
 	conf = config.GetInstance()
 	//加载服务器启动配置
-	MCDconfig := conf.GetConfig()
+	MCDconfig := conf.GetStartConfig()
 	commandArgv = []string{
 		MCDconfig["Xmx"],
 		MCDconfig["Xms"],

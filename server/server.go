@@ -16,7 +16,6 @@ var (
 
 type Server struct {
 	Stdout *bufio.Reader  //子进程输出
-	Stdin  *bufio.Writer  //子进程输入
 	Cmd    *exec.Cmd      //子进程实例
 	stdin  io.WriteCloser //用于关闭输入管道
 	stdout io.ReadCloser  //用于关闭输出管道
@@ -46,7 +45,6 @@ func (svr *Server) Init(argv []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	svr.Stdin = bufio.NewWriter(svr.stdin)
 }
 
 //运行子进程

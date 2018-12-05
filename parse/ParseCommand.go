@@ -1,7 +1,7 @@
 package parse
 
 import (
-	"MCDaemon-go/command"
+	"MCDaemon-go/lib"
 	"regexp"
 	"strings"
 )
@@ -14,7 +14,7 @@ type ParseCommand struct {
 }
 
 //实现解析器接口
-func (c ParseCommand) Parsing(word string) (*command.Command, bool) {
+func (c ParseCommand) Parsing(word string) (*lib.Command, bool) {
 	re := regexp.MustCompile(`\[\d+:\d+:\d+\]\s+\[Server thread/INFO\]:\s+<(?P<player>.+)>\s+(?P<commond>((!|!!)+.+))\s*`)
 	match := re.FindStringSubmatch(word)
 	groupNames := re.SubexpNames()
@@ -33,7 +33,7 @@ func (c ParseCommand) Parsing(word string) (*command.Command, bool) {
 		c.Player = result["player"]
 		c.Cmd = cmdArgv[0]
 		c.Argv = cmdArgv[1:]
-		_commond := &command.Command{
+		_commond := &lib.Command{
 			Player: c.Player,
 			Cmd:    c.Cmd,
 			Argv:   c.Argv,
