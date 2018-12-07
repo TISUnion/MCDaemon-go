@@ -1,16 +1,11 @@
 package plugin
 
-import (
-	"MCDaemon-go/config"
-	"MCDaemon-go/lib"
-)
-
-var PluginsList map[string]lib.Plugin
+var PluginsList PluginMap
 
 func init() {
-	Plugins := config.GetPlugins(false)
 	//加载热插件
-	for k, v := range Plugins {
-		PluginsList[k] = HotPlugin(v)
-	}
+	PluginsList.GetHotPlugins(false)
+
+	//注册冷插件
+	PluginsList.RegisterPlugin("!!yinyinmaster", Yinyin{}) //测试插件
 }
