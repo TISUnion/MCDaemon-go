@@ -19,11 +19,12 @@ var (
 )
 
 type Server struct {
-	Stdout *bufio.Reader  //子进程输出
-	Cmd    *exec.Cmd      //子进程实例
-	stdin  io.WriteCloser //用于关闭输入管道
-	stdout io.ReadCloser  //用于关闭输出管道
-	lock   sync.Mutex     //输入管道同步锁
+	Stdout     *bufio.Reader    //子进程输出
+	Cmd        *exec.Cmd        //子进程实例
+	stdin      io.WriteCloser   //用于关闭输入管道
+	stdout     io.ReadCloser    //用于关闭输出管道
+	lock       sync.Mutex       //输入管道同步锁
+	pulginLock chan interface{} //插件执行通道，可用于堵塞
 }
 
 //单例模式
@@ -72,6 +73,17 @@ func (svr *Server) RunParsers(word string) {
 //运行插件
 func (svr *Server) RunPlugin(cmd *command.Command) {
 	plugin.PluginsList[cmd.Cmd].Handle(cmd, svr)
+}
+
+//堵塞所有插件的运行
+//加锁
+func (svr *Server) LockPluginRuntime() {
+
+}
+
+//解锁
+func (svr *Server) UnlockPluginRuntime() {
+
 }
 
 //关闭服务器
