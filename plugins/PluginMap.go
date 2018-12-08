@@ -15,7 +15,7 @@ func (pm PluginMap) GetHotPlugins(is_reload bool) {
 	}
 }
 
-//注册热插件
+//注册冷插件
 func (pm PluginMap) RegisterPlugin(name string, lp lib.Plugin) {
 	pm[name] = lp
 }

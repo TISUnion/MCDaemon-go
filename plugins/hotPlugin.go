@@ -3,9 +3,9 @@ package plugin
 import (
 	"MCDaemon-go/command"
 	"MCDaemon-go/lib"
-	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os/exec"
 	"strings"
 )
@@ -14,22 +14,21 @@ import (
 type HotPlugin string
 
 func (hp HotPlugin) Handle(c *command.Command, s lib.Server) {
-	commandName := "./plugin/" + c.PluginName
+	commandName := "./hotPlugins/" + c.PluginName
 	pluginProcess := exec.Command(commandName, c.Argv...)
 	stdout, _ := pluginProcess.StdoutPipe()
-	outRead := bufio.NewReaderSize(stdout, 10000)
-	var buffer []byte = make([]byte, 10000)
-	if err := pluginProcess.Run(); err != nil {
-		s.Tell(c.PluginName+"插件出错！", c.Player)
+	defer stdout.Close()
+	if err := pluginProcess.Start(); err != nil {
+		s.Tell(fmt.Sprintf("%s插件出错！ 因为%v", c.PluginName, err), c.Player)
 	}
-	n, err := outRead.Read(buffer)
+	buffer, err := ioutil.ReadAll(stdout)
 	if err != nil {
 		if err != io.EOF {
-			msg := fmt.Sprint("%s插件出错！ 因为%v", c.PluginName, err)
+			msg := fmt.Sprintf("%s插件出错！ 因为%v", c.PluginName, err)
 			s.Tell(msg, c.Player)
 		}
 	}
-	retStr := string(buffer[:n])
+	retStr := string(buffer)
 	/**
 	插件返回数据以空格区分参数
 	第一个为调用方法名
@@ -37,12 +36,16 @@ func (hp HotPlugin) Handle(c *command.Command, s lib.Server) {
 	第三个如果有则代表玩家名
 	*/
 	argv := strings.Fields(retStr)
-	switch argv[0] {
-	case "say":
-		s.Say(argv[1])
-	case "tell":
-		s.Tell(argv[1], argv[2])
-	case "Execute":
-		s.Execute(argv[1])
+	if len(argv) >= 2 {
+		switch argv[0] {
+		case "say":
+			s.Say(argv[1])
+		case "tell":
+			if len(argv) >= 3 {
+				s.Tell(argv[1], argv[2])
+			}
+		case "Execute":
+			s.Execute(argv[1])
+		}
 	}
 }

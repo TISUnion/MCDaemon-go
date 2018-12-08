@@ -3,6 +3,9 @@ package plugin
 var PluginsList PluginMap
 
 func init() {
+
+	PluginsList = make(PluginMap)
+
 	//加载热插件
 	PluginsList.GetHotPlugins(false)
 
