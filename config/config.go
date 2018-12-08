@@ -50,6 +50,7 @@ func GetStartConfig() []string {
 		xms,
 		"-jar",
 		fmt.Sprintf("%s/%s", serverPath, serverName),
+		"-Dfile.encoding=UTF-8",
 	}
 	if gui != "true" {
 		result = append(result, "nogui")
@@ -61,7 +62,7 @@ func GetStartConfig() []string {
 func GetPlugins(is_rebuild bool) map[string]string {
 	if is_rebuild || plugins == nil {
 		cfg, _ = ini.Load("MCD_conig.ini")
-		plugins := make(map[string]string)
+		plugins = make(map[string]string)
 		keys := cfg.Section("plugins").KeyStrings()
 		for _, val := range keys {
 			plugins[val] = cfg.Section("plugins").Key(val).String()
