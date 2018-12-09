@@ -8,6 +8,5 @@ type Server interface {
 	Execute(string)
 	Close()
 	RunPlugin(*command.Command)
-	LockPluginRuntime()
-	UnlockPluginRuntime()
+	RunUniquePlugin(func())
 }
