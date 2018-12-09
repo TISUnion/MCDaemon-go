@@ -5,7 +5,7 @@
 ### 在windows10以及centos7中运行成功
 -----
 ## 开始使用
-- ### 下载最新的 release
+- ### 下载最新的 release(beta版不提供)
 - ### 修改配置文件MCD_conig.ini
   1. 修改server_name为服务端文件名
   2. 修改server_path为服务端文件所在文件夹，注意路径！
