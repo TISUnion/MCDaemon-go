@@ -73,7 +73,7 @@ func (svr *Server) run_process() {
 func (svr *Server) RunParsers(word string) {
 	for _, val := range parser.ParseList {
 		cmd, ok := val.Parsing(word)
-		if ok {
+		if ok && plugin.PluginsList[cmd.Cmd] != nil {
 			//异步运行插件
 			svr.pulginPool <- 1
 			go svr.RunPlugin(cmd)
