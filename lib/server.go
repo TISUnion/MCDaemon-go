@@ -7,6 +7,7 @@ type Server interface {
 	Tell(string, string)
 	Execute(string)
 	Close()
+	Restart()
 	RunPlugin(*command.Command)
 	RunUniquePlugin(func())
 }

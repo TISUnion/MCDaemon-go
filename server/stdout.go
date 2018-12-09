@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"runtime"
@@ -25,11 +24,7 @@ func (svr *Server) WaitEndLoading() {
 		n, err := svr.Stdout.Read(buffer)
 		retStr = string(buffer[:n])
 		if err != nil {
-			if err == io.EOF {
-				log.Fatalln("子进程标准输出出错")
-			} else {
-				log.Fatalln("获取标准输出出错")
-			}
+			log.Fatalln("服务器启动失败！")
 			break
 		}
 		if strings.Contains(retStr, "[Server thread/INFO]: Done") {
@@ -45,11 +40,6 @@ func (svr *Server) Run() {
 	for {
 		n, err := svr.Stdout.Read(buffer)
 		if err != nil {
-			if err == io.EOF {
-				log.Fatalln("子进程标准输出出错")
-			} else {
-				log.Fatalln("获取标准输出出错")
-			}
 			break
 		}
 		var retStr string

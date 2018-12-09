@@ -28,6 +28,7 @@ type Server struct {
 	lock          sync.Mutex       //输入管道同步锁
 	pulginPool    chan interface{} //插件池
 	maxRunPlugins int              //插件最大并发数
+	SubServers    []*Server        //保存存档后的镜像（用于之后保存并开启镜像服务器的插件需要）
 }
 
 //单例模式
@@ -99,10 +100,20 @@ func (svr *Server) RunUniquePlugin(handle func()) {
 	svr.pulginPool <- 1
 }
 
+//重启服务器
+func (svr *Server) Restart() {
+	svr.Close()
+	//获取所有启动项配置
+	MCDeamon := config.GetStartConfig()
+	//初始化
+	svr.Init(MCDeamon)
+	//等待加载地图
+	svr.WaitEndLoading()
+	//正式运行MCD
+	svr.Run()
+}
+
 //关闭服务器
 func (svr *Server) Close() {
-	svr.stdin.Close()
-	svr.stdout.Close()
-	svr.Cmd.Process.Kill()
-	close(svr.pulginPool)
+	svr.Execute("/stop")
 }

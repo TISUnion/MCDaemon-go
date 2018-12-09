@@ -22,7 +22,7 @@ func (svr Server) Execute(_command string) {
 	svr.lock.Lock()
 	_, err := io.WriteString(svr.stdin, _command)
 	if err != nil {
-		fmt.Println("there is a error!", err)
+		// fmt.Println("there is a error!", err)
 	}
 	svr.lock.Unlock()
 }
