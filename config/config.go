@@ -9,23 +9,26 @@ import (
 
 //配置变量
 var (
-	cfg     *ini.File
+	Cfg     *ini.File
 	err     error
 	plugins map[string]string
 )
 
-//获取服务器启动配置
-func GetStartConfig() []string {
+func init() {
 	//加载配置文件
-	cfg, err = ini.Load("MCD_conig.ini")
+	Cfg, err = ini.Load("MCD_conig.ini")
 	if err != nil {
-		fmt.Printf("Fail to read file: %v", err)
+		fmt.Printf("读取配置文件失败: %v", err)
 		os.Exit(1)
 	}
+}
+
+//获取服务器启动配置
+func GetStartConfig() []string {
 	//读取配置
-	Section := cfg.Section("MCDeamon")
+	Section := Cfg.Section("MCDeamon")
 	serverName := Section.Key("server_name").String()
-	serverPath := Section.Key("server_path").String()
+	// serverPath := Section.Key("server_path").String()
 	//设置默认值
 	xms := Section.Key("Xms").Validate(func(in string) string {
 		if len(in) == 0 {
@@ -49,7 +52,7 @@ func GetStartConfig() []string {
 		xmx,
 		xms,
 		"-jar",
-		fmt.Sprintf("%s/%s", serverPath, serverName),
+		serverName,
 		"-Dfile.encoding=UTF-8",
 	}
 	if gui != "true" {
@@ -60,12 +63,20 @@ func GetStartConfig() []string {
 
 //获取插件配置
 func GetPlugins(is_rebuild bool) map[string]string {
-	if is_rebuild || plugins == nil {
-		cfg, _ = ini.Load("MCD_conig.ini")
+	if is_rebuild {
+		Cfg, err = ini.Load("MCD_conig.ini")
+		if err != nil {
+			fmt.Printf("读取配置文件失败: %v", err)
+			os.Exit(1)
+		}
+		//重置配置文件
+		plugins = nil
+	}
+	if plugins == nil {
 		plugins = make(map[string]string)
-		keys := cfg.Section("plugins").KeyStrings()
+		keys := Cfg.Section("plugins").KeyStrings()
 		for _, val := range keys {
-			plugins[val] = cfg.Section("plugins").Key(val).String()
+			plugins[val] = Cfg.Section("plugins").Key(val).String()
 		}
 	}
 	return plugins
@@ -78,16 +89,17 @@ func GetPluginName(cmd string) string {
 }
 
 func SetEula() {
-	cfg, err = ini.Load("eula.txt")
+	path := fmt.Sprintf("%s/eula.txt", Cfg.Section("MCDeamon").Key("server_path").String())
+	eulaCfg, eulaerr := ini.Load(path)
 	//不存在eula.txt
-	if err != nil {
-		cfg = ini.Empty()
-		cfg.Section("").NewKey("eula", "true")
-		_ = cfg.SaveTo("eula.txt")
+	if eulaerr != nil {
+		eulaCfg = ini.Empty()
+		eulaCfg.Section("").NewKey("eula", "true")
+		_ = eulaCfg.SaveTo(path)
 	}
 	//如果为false
-	if cfg.Section("").Key("eula").String() == "false" {
-		cfg.Section("").NewKey("eula", "true")
-		_ = cfg.SaveTo("eula.txt")
+	if eulaCfg.Section("").Key("eula").String() == "false" {
+		eulaCfg.Section("").NewKey("eula", "true")
+		_ = eulaCfg.SaveTo(path)
 	}
 }
