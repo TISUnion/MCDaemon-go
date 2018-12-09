@@ -19,8 +19,8 @@
    2. 在MCD_conig.ini的[plugins]域中注册热插件
    3. 通过：
         ```go
-            args := os.Args
-	        args = args[1:] 
+      args := os.Args
+      args = args[1:]
         ```
       获取插件的命令的参数
    4. 返回调用的MCD命令api以及参数
