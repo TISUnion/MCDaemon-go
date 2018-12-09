@@ -2,12 +2,14 @@ package server
 
 import (
 	"MCDaemon-go/command"
+	"MCDaemon-go/config"
 	parser "MCDaemon-go/parsers"
 	plugin "MCDaemon-go/plugins"
 	"bufio"
 	"io"
 	"log"
 	"os/exec"
+	"strconv"
 	"sync"
 )
 
@@ -19,12 +21,13 @@ var (
 )
 
 type Server struct {
-	Stdout     *bufio.Reader    //子进程输出
-	Cmd        *exec.Cmd        //子进程实例
-	stdin      io.WriteCloser   //用于关闭输入管道
-	stdout     io.ReadCloser    //用于关闭输出管道
-	lock       sync.Mutex       //输入管道同步锁
-	pulginLock chan interface{} //插件执行通道，可用于堵塞
+	Stdout        *bufio.Reader    //子进程输出
+	Cmd           *exec.Cmd        //子进程实例
+	stdin         io.WriteCloser   //用于关闭输入管道
+	stdout        io.ReadCloser    //用于关闭输出管道
+	lock          sync.Mutex       //输入管道同步锁
+	pulginPool    chan interface{} //插件池
+	maxRunPlugins int              //插件最大并发数
 }
 
 //单例模式
@@ -42,16 +45,22 @@ func GetServerInstance() *Server {
 
 //根据参数初始化服务器
 func (svr *Server) Init(argv []string) {
+	//创建子进程实例
 	svr.Cmd = exec.Command("java", argv...)
+	svr.Cmd.Dir = "minecraft"
 	svr.stdout, err = svr.Cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal(err)
 	}
+	//接管子进程输入输出
 	svr.Stdout = bufio.NewReader(svr.stdout)
 	svr.stdin, err = svr.Cmd.StdinPipe()
 	if err != nil {
 		log.Fatal(err)
 	}
+	//初始化插件执行池参数
+	svr.maxRunPlugins, _ = strconv.Atoi(config.Cfg.Section("MCDeamon").Key("maxRunPlugins").String())
+	svr.pulginPool = make(chan interface{}, svr.maxRunPlugins)
 }
 
 //运行子进程
@@ -65,6 +74,7 @@ func (svr *Server) RunParsers(word string) {
 		cmd, ok := val.Parsing(word)
 		if ok {
 			//异步运行插件
+			svr.pulginPool <- 1
 			go svr.RunPlugin(cmd)
 		}
 	}
@@ -73,17 +83,20 @@ func (svr *Server) RunParsers(word string) {
 //运行插件
 func (svr *Server) RunPlugin(cmd *command.Command) {
 	plugin.PluginsList[cmd.Cmd].Handle(cmd, svr)
+	<-svr.pulginPool
 }
 
-//堵塞所有插件的运行
-//加锁
-func (svr *Server) LockPluginRuntime() {
-
-}
-
-//解锁
-func (svr *Server) UnlockPluginRuntime() {
-
+//等待现有插件的完成并停止后面插件的运行，在执行相关操作
+func (svr *Server) RunUniquePlugin(handle func()) {
+	<-svr.pulginPool
+	for i := 0; i < 10; i++ {
+		svr.pulginPool <- 1
+	}
+	handle()
+	for i := 0; i < 10; i++ {
+		<-svr.pulginPool
+	}
+	svr.pulginPool <- 1
 }
 
 //关闭服务器
@@ -91,4 +104,5 @@ func (svr *Server) Close() {
 	svr.stdin.Close()
 	svr.stdout.Close()
 	svr.Cmd.Process.Kill()
+	close(svr.pulginPool)
 }
