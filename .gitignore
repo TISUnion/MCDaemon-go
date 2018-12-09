@@ -13,9 +13,5 @@
 
 #minecraft
 logs
-minecraft
-eula.txt
-world
-*.json
-server.properties
-crash-reports
+minecraft/*
+plugins/TestPlugin.go
