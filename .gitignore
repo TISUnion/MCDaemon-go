@@ -14,4 +14,9 @@
 #minecraft
 logs
 minecraft/*
-plugins/TestPlugin.go
+plugins/*
+!plugins/BasePlugin.go
+!plugins/ExampleYinyinPlugin.go
+!plugins/hotPlugin.go
+!plugins/pluginList.go
+!plugins/pluginMap.go
