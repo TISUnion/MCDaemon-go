@@ -48,7 +48,7 @@ func GetServerInstance() *Server {
 func (svr *Server) Init(argv []string) {
 	//创建子进程实例
 	svr.Cmd = exec.Command("java", argv...)
-	svr.Cmd.Dir = "minecraft"
+	svr.Cmd.Dir = config.Cfg.Section("MCDeamon").Key("server_path").String()
 	svr.stdout, err = svr.Cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal(err)
