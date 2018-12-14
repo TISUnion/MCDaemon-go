@@ -8,6 +8,8 @@ type Server interface {
 	Execute(string)
 	Close()
 	Restart()
+	Start()
 	RunPlugin(*command.Command)
 	RunUniquePlugin(func())
+	WriteLog(level string, msg string)
 }
