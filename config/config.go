@@ -9,9 +9,10 @@ import (
 
 //配置变量
 var (
-	Cfg     *ini.File
-	err     error
-	plugins map[string]string
+	Cfg       *ini.File
+	err       error
+	plugins   map[string]string
+	PluginCfg *ini.File
 )
 
 func init() {
@@ -86,6 +87,18 @@ func GetPlugins(is_rebuild bool) map[string]string {
 func GetPluginName(cmd string) string {
 	pluins := GetPlugins(false)
 	return pluins[cmd]
+}
+
+//获取插件配置文件对象
+func GetPluginCfg(is_rebuild bool) *ini.File {
+	//加载配置文件
+	if PluginCfg == nil || is_rebuild {
+		PluginCfg, err = ini.Load("Plugin_conf.ini")
+		if err != nil {
+			fmt.Printf("读取插件配置文件失败: %v", err)
+		}
+	}
+	return PluginCfg
 }
 
 func SetEula() {
