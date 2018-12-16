@@ -8,6 +8,5 @@ var ParseList []lib.Parser
 func init() {
 	ParseList = []lib.Parser{
 		defaultParser{},
-		BackupParser{},
 	}
 }
