@@ -4,29 +4,21 @@ import (
 	"MCDaemon-go/command"
 	"MCDaemon-go/lib"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"os/exec"
 	"strings"
 )
 
 //热加载插件类型
-type HotPlugin string
+type HotPlugin struct {
+	string
+}
 
-func (hp HotPlugin) Handle(c *command.Command, s lib.Server) {
+func (hp *HotPlugin) Handle(c *command.Command, s lib.Server) {
 	commandName := "./hotPlugins/" + c.PluginName
 	pluginProcess := exec.Command(commandName, c.Argv...)
-	stdout, _ := pluginProcess.StdoutPipe()
-	defer stdout.Close()
-	if err := pluginProcess.Start(); err != nil {
-		s.Tell(fmt.Sprintf("%s插件出错！ 因为%v", c.PluginName, err), c.Player)
-	}
-	buffer, err := ioutil.ReadAll(stdout)
+	buffer, err := pluginProcess.Output()
 	if err != nil {
-		if err != io.EOF {
-			msg := fmt.Sprintf("%s插件出错！ 因为%v", c.PluginName, err)
-			s.Tell(msg, c.Player)
-		}
+		s.Tell(fmt.Sprint("插件出现错误：", err), c.Player)
 	}
 	retStr := string(buffer)
 	/**
