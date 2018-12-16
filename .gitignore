@@ -27,3 +27,4 @@ logs/*
 back-up/*
 start
 *.rar
+*.log
