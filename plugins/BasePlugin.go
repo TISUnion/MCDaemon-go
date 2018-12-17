@@ -14,7 +14,10 @@ import (
 type BasePlugin struct {
 }
 
-func (hp BasePlugin) Handle(c *command.Command, s lib.Server) {
+func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
+	if len(c.Argv) == 0 {
+		c.Argv = append(c.Argv, "help")
+	}
 	switch c.Argv[0] {
 	case "restart":
 		f := s.Restart

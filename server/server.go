@@ -86,7 +86,9 @@ func (svr *Server) RunParsers(word string) {
 		if ok && plugin.PluginsList[cmd.Cmd] != nil {
 			//异步运行插件
 			svr.pulginPool <- 1
-			svr.WriteLog("info", fmt.Sprintf("玩家 %s 运行了 %s 命令", cmd.Player))
+			if cmd.Player != "" {
+				svr.WriteLog("info", fmt.Sprintf("玩家 %s 运行了 %s 命令", cmd.Player, cmd.Cmd))
+			}
 			go svr.RunPlugin(cmd)
 		}
 	}

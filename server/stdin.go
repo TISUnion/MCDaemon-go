@@ -24,5 +24,5 @@ func (svr Server) Execute(_command string) {
 	if err != nil {
 		// fmt.Println("there is a error!", err)
 	}
-	svr.lock.Unlock()
+	defer svr.lock.Unlock()
 }

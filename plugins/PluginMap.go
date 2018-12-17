@@ -11,7 +11,7 @@ type PluginMap map[string]lib.Plugin
 func (pm PluginMap) GetHotPlugins(is_reload bool) {
 	plugins := config.GetPlugins(is_reload)
 	for k, v := range plugins {
-		pm[k] = HotPlugin(v)
+		pm[k] = &HotPlugin{v}
 	}
 }
 

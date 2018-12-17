@@ -22,3 +22,9 @@ plugins/*
 parsers/*
 !parsers/defaultParser.go
 !parsers/parserList.go
+logs/*
+!.keep
+back-up/*
+start
+*.rar
+*.log
