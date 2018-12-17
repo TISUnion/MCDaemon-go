@@ -5,12 +5,13 @@
 ### 在windows10以及centos7中运行成功
 -----
 ## 开始使用
-- ### 下载最新的 release(beta版不提供)
-- ### 修改配置文件MCD_conig.ini
+- 下载最新的release(beta版不提供)
+- 最新版的release默认包含了[插件收录库](https://github.com/TISUnion/MCDaemonPlugins-go)的所有插件
+- 修改配置文件MCD_conig.ini
   1. 修改server_name为服务端文件名
   2. 修改server_path为服务端文件所在文件夹，注意路径！
-- ### 根据需求更改配置文件参数
-- ### 运行start(linux/unix)或者start.exe（windows）
+- 根据需求更改配置文件参数
+- 运行start(linux/unix)或者start.exe（windows）
 -----
 ## 插件编写
 
