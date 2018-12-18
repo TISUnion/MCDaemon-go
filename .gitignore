@@ -28,3 +28,4 @@ back-up/*
 start
 *.rar
 *.log
+go.sum
