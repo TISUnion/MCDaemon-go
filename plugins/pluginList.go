@@ -1,10 +1,13 @@
 package plugin
 
 var PluginsList PluginMap
+var DisablePluginsList PluginMap
 
 func init() {
-
+	//可使用插件列表
 	PluginsList = make(PluginMap)
+	//已被禁用插件列表
+	DisablePluginsList = make(PluginMap)
 
 	//加载热插件
 	PluginsList.GetHotPlugins(false)

@@ -19,3 +19,13 @@ func (pm PluginMap) GetHotPlugins(is_reload bool) {
 func (pm PluginMap) RegisterPlugin(name string, lp lib.Plugin) {
 	pm[name] = lp
 }
+
+//移除插件
+func (pm PluginMap) DelPlugin(name string) (lib.Plugin, bool) {
+	if pm[name] == nil {
+		return nil, false
+	}
+	plugin := pm[name]
+	delete(pm, name)
+	return plugin, true
+}
