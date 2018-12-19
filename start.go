@@ -2,12 +2,37 @@ package main
 
 import (
 	"MCDaemon-go/config"
+	"MCDaemon-go/container"
 	"MCDaemon-go/server"
 )
 
 var (
 	MCDeamon []string
 )
+
+// 　　 ┏┓　　  ┏┓
+//　　┏┛┻━━━┛┻┓
+// 　 ┃　　　　　　　 ┃
+// 　 ┃　　　━　　　 ┃
+// 　 ┃　┳┛　┗┳　 ┃
+//　　┃　　　　　　　 ┃
+//　　┃　　　┻　　　 ┃
+//　　┃　　　　　　　 ┃
+//　　┗━┓　　　┏━┛   Codes are far away from bugs with the animal protecting
+//　　　　┃　　　┃       神兽保佑,代码无bug
+//　　　　┃　　　┃
+//　　　　┃　　　┃
+//　　　　┃　　　┃
+//　　　　┃　　　┃
+//　　　　┃　　　┃
+//　　　　┃　　　┃
+//　　　　┃　　　┗━━━┓
+// 　　　  ┃　　　　　 ┣┓
+//　　　　┃　　　　 ┏┛
+//　　　　┗┓┓┏━┳┓┏┛
+//　　　　　┃┫┫　┃┫┫
+//　　　　　┗┻┛　┗┻┛
+//
 
 func init() {
 	//配置eula文件
@@ -17,13 +42,15 @@ func init() {
 }
 
 func main() {
-	//获取服务器实例
-	svr := server.GetServerInstance()
+	c := container.GetInstance()
+	defaultServer := &server.Server{}
 	//初始化
-	svr.Init(MCDeamon)
+	defaultServer.Init("default", MCDeamon)
+	//加入到容器中
+	c.Add("default", defaultServer)
 	//等待加载地图
-	svr.WaitEndLoading()
+	defaultServer.WaitEndLoading()
 	//正式运行MCD
-	svr.Run()
-	defer svr.Close()
+	defaultServer.Run()
+
 }
