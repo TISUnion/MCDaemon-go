@@ -28,13 +28,13 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 		s.RunUniquePlugin(f)
 	case "reload":
 		f := func() {
-			PluginsList.GetHotPlugins(true)
+			PluginMap(s.GetPluginList()).GetHotPlugins(true)
 		}
 		s.RunUniquePlugin(f)
 	case "ban":
 		if len(c.Argv) > 1 {
-			if plugin, ok := PluginsList.DelPlugin(c.Argv[1]); ok {
-				DisablePluginsList.RegisterPlugin(c.Argv[1], plugin)
+			if plugin, ok := PluginMap(s.GetPluginList()).DelPlugin(c.Argv[1]); ok {
+				PluginMap(s.GetDisablePluginList()).RegisterPlugin(c.Argv[1], plugin)
 			} else {
 				s.Tell("不存在该插件，建议!!server show list查看可使用的插件", c.Player)
 			}
@@ -43,8 +43,8 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 		}
 	case "pardon":
 		if len(c.Argv) > 1 {
-			if plugin, ok := DisablePluginsList.DelPlugin(c.Argv[1]); ok {
-				PluginsList.RegisterPlugin(c.Argv[1], plugin)
+			if plugin, ok := PluginMap(s.GetDisablePluginList()).DelPlugin(c.Argv[1]); ok {
+				PluginMap(s.GetPluginList()).RegisterPlugin(c.Argv[1], plugin)
 			} else {
 				s.Tell("不存在该插件，建议!!server show banlist查看已被禁用的插件", c.Player)
 			}
@@ -55,13 +55,13 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 		if len(c.Argv) > 1 {
 			if c.Argv[1] == "list" {
 				var text string
-				for k, _ := range PluginsList {
+				for k, _ := range PluginMap(s.GetPluginList()) {
 					text += k + "\\n"
 				}
 				s.Tell("插件列表：\\n"+text, c.Player)
 			} else if c.Argv[1] == "banlist" {
 				var text string
-				for k, _ := range DisablePluginsList {
+				for k, _ := range PluginMap(s.GetDisablePluginList()) {
 					text += k + "\\n"
 				}
 				s.Tell("已禁用插件列表：\\n"+text, c.Player)

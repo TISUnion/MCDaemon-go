@@ -2,11 +2,9 @@ package parser
 
 import "MCDaemon-go/lib"
 
-var ParseList []lib.Parser
-
 //语法解析器列表
-func init() {
-	ParseList = []lib.Parser{
+func CreateParserList() []lib.Parser {
+	return []lib.Parser{
 		defaultParser{},
 	}
 }
