@@ -8,11 +8,7 @@ import (
 )
 
 //解析玩家输入文字，判断是否是命令 ， 实现了ParseMachine接口
-type defaultParser struct {
-	Player string   //发出命令的玩家
-	Cmd    string   //命令
-	Argv   []string //参数
-}
+type defaultParser struct{}
 
 //默认语法解析器
 func (c defaultParser) Parsing(word string) (*command.Command, bool) {
@@ -31,16 +27,13 @@ func (c defaultParser) Parsing(word string) (*command.Command, bool) {
 
 		// 解析命令以及参数
 		cmdArgv := strings.Fields(result["commond"])
-		c.Player = result["player"]
-		c.Cmd = cmdArgv[0]
-		c.Argv = cmdArgv[1:]
 		_commond := &command.Command{
-			Player: c.Player,
-			Cmd:    c.Cmd,
-			Argv:   c.Argv,
+			Player: result["player"],
+			Cmd:    cmdArgv[0],
+			Argv:   cmdArgv[1:],
 		}
 		//获取插件名称
-		_commond.PluginName = config.GetPluginName(c.Cmd)
+		_commond.PluginName = config.GetPluginName(cmdArgv[0])
 		return _commond, true
 	}
 	return nil, false
