@@ -1,8 +1,8 @@
 package server
 
 import (
-	"MCDaemon-go/command"
 	"MCDaemon-go/config"
+	"MCDaemon-go/lib"
 	parser "MCDaemon-go/parsers"
 	plugin "MCDaemon-go/plugins"
 	"bufio"
@@ -18,40 +18,25 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//单例模式
-var (
-	is_set bool
-	svr    *Server
-	err    error
-)
+var err error
 
 type Server struct {
-	Stdout        *bufio.Reader    //子进程输出
-	Cmd           *exec.Cmd        //子进程实例
-	stdin         io.WriteCloser   //用于关闭输入管道
-	stdout        io.ReadCloser    //用于关闭输出管道
-	lock          sync.Mutex       //输入管道同步锁
-	pulginPool    chan interface{} //插件池
-	maxRunPlugins int              //插件最大并发数
-	log           *logrus.Logger   //日志文件
-	SubServers    []*Server        //保存存档后的镜像（用于之后保存并开启镜像服务器的插件需要）
-}
-
-//单例模式
-func init() {
-	is_set = false
-}
-
-//获取实例
-func GetServerInstance() *Server {
-	if !is_set {
-		svr = &Server{}
-	}
-	return svr
+	name              string           //服务器名称
+	Stdout            *bufio.Reader    //子进程输出
+	Cmd               *exec.Cmd        //子进程实例
+	stdin             io.WriteCloser   //用于关闭输入管道
+	stdout            io.ReadCloser    //用于关闭输出管道
+	lock              sync.Mutex       //输入管道同步锁
+	pulginPool        chan interface{} //插件池
+	maxRunPlugins     int              //插件最大并发数
+	log               *logrus.Logger   //日志文件
+	pluginList        plugin.PluginMap //插件列表
+	disablePluginList plugin.PluginMap //禁用插件列表
+	parserList        []lib.Parser     //语法解析器列表
 }
 
 //根据参数初始化服务器
-func (svr *Server) Init(argv []string) {
+func (svr *Server) Init(name string, argv []string) {
 	//创建子进程实例
 	svr.Cmd = exec.Command("java", argv...)
 	svr.Cmd.Dir = config.Cfg.Section("MCDeamon").Key("server_path").String()
@@ -72,45 +57,15 @@ func (svr *Server) Init(argv []string) {
 	//初始化日志类
 	svr.log = logrus.New()
 	svr.log.SetLevel(logrus.DebugLevel)
+
+	//初始化插件列表
+	svr.pluginList, svr.disablePluginList = plugin.CreatePluginsList()
+	svr.parserList = parser.CreateParserList()
 }
 
 //运行子进程
 func (svr *Server) run_process() {
 	svr.Cmd.Start()
-}
-
-//运行所有语法解析器
-func (svr *Server) RunParsers(word string) {
-	for _, val := range parser.ParseList {
-		cmd, ok := val.Parsing(word)
-		if ok && plugin.PluginsList[cmd.Cmd] != nil {
-			//异步运行插件
-			svr.pulginPool <- 1
-			if cmd.Player != "" {
-				svr.WriteLog("info", fmt.Sprintf("玩家 %s 运行了 %s 命令", cmd.Player, cmd.Cmd))
-			}
-			go svr.RunPlugin(cmd)
-		}
-	}
-}
-
-//运行插件
-func (svr *Server) RunPlugin(cmd *command.Command) {
-	plugin.PluginsList[cmd.Cmd].Handle(cmd, svr)
-	<-svr.pulginPool
-}
-
-//等待现有插件的完成并停止后面插件的运行，在执行相关操作
-func (svr *Server) RunUniquePlugin(handle func()) {
-	<-svr.pulginPool
-	for i := 0; i < 10; i++ {
-		svr.pulginPool <- 1
-	}
-	handle()
-	for i := 0; i < 10; i++ {
-		<-svr.pulginPool
-	}
-	svr.pulginPool <- 1
 }
 
 //写入日志
@@ -141,15 +96,24 @@ func (svr *Server) Restart() {
 	//获取所有启动项配置
 	MCDeamon := config.GetStartConfig()
 	//初始化
-	svr.Init(MCDeamon)
+	svr.Init(svr.name, MCDeamon)
 	//等待加载地图
 	svr.WaitEndLoading()
 	//正式运行MCD
 	svr.Run()
 }
 
-//启动服务器（用于镜像启动）
-func (svr *Server) Start() {}
+//复制一个镜像服务器（用于镜像启动）
+func (svr *Server) Clone(name string, Argv []string) lib.Server {
+	cloneServer := &Server{}
+	//初始化
+	cloneServer.Init(name, Argv)
+	//等待加载地图
+	cloneServer.WaitEndLoading()
+	//正式运行MCD
+	cloneServer.Run()
+	return cloneServer
+}
 
 //关闭服务器
 func (svr *Server) Close() {

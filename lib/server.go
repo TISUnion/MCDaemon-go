@@ -1,6 +1,8 @@
 package lib
 
-import "MCDaemon-go/command"
+import (
+	"MCDaemon-go/command"
+)
 
 type Server interface {
 	Say(string)
@@ -8,8 +10,11 @@ type Server interface {
 	Execute(string)
 	Close()
 	Restart()
-	Start()
+	Clone(string, []string) Server
 	RunPlugin(*command.Command)
 	RunUniquePlugin(func())
 	WriteLog(level string, msg string)
+	GetPluginList() map[string]Plugin
+	GetDisablePluginList() map[string]Plugin
+	GetParserList() []Parser
 }
