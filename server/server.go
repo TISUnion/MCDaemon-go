@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"strconv"
@@ -105,6 +106,22 @@ func (svr *Server) Restart() {
 
 //复制一个镜像服务器（用于镜像启动）
 func (svr *Server) Clone(name string, Argv []string) lib.Server {
+	// 得到一个可用的端口
+	getPort := func() (port int, err error) {
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			return 0, err
+		}
+		defer listener.Close()
+
+		addr := listener.Addr().String()
+		_, portString, err := net.SplitHostPort(addr)
+		if err != nil {
+			return 0, err
+		}
+
+		return strconv.Atoi(portString)
+	}
 	cloneServer := &Server{}
 	//初始化
 	cloneServer.Init(name, Argv)
