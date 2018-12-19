@@ -16,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-ini/ini"
 	"github.com/sirupsen/logrus"
 )
 
@@ -106,23 +107,27 @@ func (svr *Server) Restart() {
 
 //复制一个镜像服务器（用于镜像启动）
 func (svr *Server) Clone(name string, Argv []string) lib.Server {
+
+	cloneServer := &Server{}
 	// 得到一个可用的端口
-	getPort := func() (port int, err error) {
+	port, _ := func() (string, bool) {
 		listener, err := net.Listen("tcp", "127.0.0.1:0")
 		if err != nil {
-			return 0, err
+			return "", false
 		}
 		defer listener.Close()
 
 		addr := listener.Addr().String()
 		_, portString, err := net.SplitHostPort(addr)
 		if err != nil {
-			return 0, err
+			return "", false
 		}
 
-		return strconv.Atoi(portString)
-	}
-	cloneServer := &Server{}
+		return portString, true
+	}()
+	//修改端口
+	cfg, _ := ini.Load("back-up/" + name + "/server.properties")
+	cfg.Section("").NewKey("server-port", port)
 	//初始化
 	cloneServer.Init(name, Argv)
 	//等待加载地图
