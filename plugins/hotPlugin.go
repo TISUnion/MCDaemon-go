@@ -18,7 +18,7 @@ func (hp *HotPlugin) Handle(c *command.Command, s lib.Server) {
 	pluginProcess := exec.Command(commandName, c.Argv...)
 	buffer, err := pluginProcess.Output()
 	if err != nil {
-		s.Tell(fmt.Sprint("插件出现错误：", err), c.Player)
+		s.Tell(c.Player, fmt.Sprint("插件出现错误：", err))
 	}
 	retStr := string(buffer)
 	/**
@@ -34,7 +34,7 @@ func (hp *HotPlugin) Handle(c *command.Command, s lib.Server) {
 			s.Say(argv[1])
 		case "tell":
 			if len(argv) >= 3 {
-				s.Tell(argv[1], argv[2])
+				s.Tell(argv[2], argv[1])
 			}
 		case "Execute":
 			s.Execute(argv[1])

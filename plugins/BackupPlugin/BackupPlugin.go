@@ -32,17 +32,17 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 		s.Say("备份完成")
 	case "compress":
 		if runtime.GOOS == "windows" {
-			s.Tell("windows服务器不支持压缩功能", c.Player)
+			s.Tell(c.Player, "windows服务器不支持压缩功能")
 		} else {
 			cmd := exec.Command("tar", "zcvf", "back-up/"+bp.backupName+".tar.gz", "back-up/"+bp.backupName)
 			if err := cmd.Run(); err != nil {
-				s.Tell(fmt.Sprint("压缩姬出问题了，因为", err), c.Player)
+				s.Tell(c.Player, fmt.Sprint("压缩姬出问题了，因为", err))
 			} else {
-				s.Tell("备份完成", c.Player)
+				s.Tell(c.Player, "备份完成")
 			}
 		}
 	default:
 		text := "使用规则：\\n!!backup save [存档名称]\\nlinux下可使用!!backup compress对最近一次save的存档进行压缩"
-		s.Tell(text, c.Player)
+		s.Tell(c.Player, text)
 	}
 }

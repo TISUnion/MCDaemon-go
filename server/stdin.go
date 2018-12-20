@@ -10,7 +10,7 @@ func (svr Server) Say(text string) {
 	svr.Execute(_command)
 }
 
-func (svr Server) Tell(text string, player string) {
+func (svr Server) Tell(player string, text string) {
 	_command := fmt.Sprintf("/tellraw %s {\"text\":\"%s\"}", player, text)
 	svr.Execute(_command)
 }

@@ -36,20 +36,20 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 			if plugin, ok := PluginMap(s.GetPluginList()).DelPlugin(c.Argv[1]); ok {
 				PluginMap(s.GetDisablePluginList()).RegisterPlugin(c.Argv[1], plugin)
 			} else {
-				s.Tell("不存在该插件，建议!!server show list查看可使用的插件", c.Player)
+				s.Tell(c.Player, "不存在该插件，建议!!server show list查看可使用的插件")
 			}
 		} else {
-			s.Tell("请输入插件名称", c.Player)
+			s.Tell(c.Player, "请输入插件名称")
 		}
 	case "pardon":
 		if len(c.Argv) > 1 {
 			if plugin, ok := PluginMap(s.GetDisablePluginList()).DelPlugin(c.Argv[1]); ok {
 				PluginMap(s.GetPluginList()).RegisterPlugin(c.Argv[1], plugin)
 			} else {
-				s.Tell("不存在该插件，建议!!server show banlist查看已被禁用的插件", c.Player)
+				s.Tell(c.Player, "不存在该插件，建议!!server show banlist查看已被禁用的插件")
 			}
 		} else {
-			s.Tell("请输入插件名称", c.Player)
+			s.Tell(c.Player, "请输入插件名称")
 		}
 	case "show":
 		if len(c.Argv) > 1 {
@@ -58,19 +58,19 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 				for k, _ := range PluginMap(s.GetPluginList()) {
 					text += k + "\\n"
 				}
-				s.Tell("插件列表：\\n"+text, c.Player)
+				s.Tell(c.Player, "插件列表：\\n"+text)
 			} else if c.Argv[1] == "banlist" {
 				var text string
 				for k, _ := range PluginMap(s.GetDisablePluginList()) {
 					text += k + "\\n"
 				}
-				s.Tell("已禁用插件列表：\\n"+text, c.Player)
+				s.Tell(c.Player, "已禁用插件列表：\\n"+text)
 			}
 		} else {
-			s.Tell("请输入查看插件类型", c.Player)
+			s.Tell(c.Player, "请输入查看插件类型")
 		}
 	default:
 		text := "!!server restart 重启服务器\\n!!server stop 关闭服务器\\n!!server reload 重新加载热插件\\n!!server ban [插件名] 禁用插件\\n!!server pardon [插件名] 恢复禁用的插件\\n!!server show list 查看插件列表\\n!!server show banlist 查看禁用插件列表"
-		s.Tell(text, c.Player)
+		s.Tell(c.Player, text)
 	}
 }
