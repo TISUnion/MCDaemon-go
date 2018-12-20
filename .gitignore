@@ -19,6 +19,7 @@ plugins/*
 !plugins/hotPlugin.go
 !plugins/pluginList.go
 !plugins/pluginMap.go
+!plugins/BackupPlugin/*
 parsers/*
 !parsers/defaultParser.go
 !parsers/parserList.go
