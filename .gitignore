@@ -23,6 +23,7 @@ plugins/*
 parsers/*
 !parsers/defaultParser.go
 !parsers/parserList.go
+!parsers/BackupParser.go
 logs/*
 !.keep
 back-up/*
