@@ -2,6 +2,7 @@ package server
 
 import (
 	"MCDaemon-go/config"
+	"MCDaemon-go/container"
 	"MCDaemon-go/lib"
 	parser "MCDaemon-go/parsers"
 	plugin "MCDaemon-go/plugins"
@@ -35,6 +36,7 @@ type Server struct {
 	pluginList        plugin.PluginMap //插件列表
 	disablePluginList plugin.PluginMap //禁用插件列表
 	parserList        []lib.Parser     //语法解析器列表
+	port              string           //启动服务器端口
 }
 
 //根据参数初始化服务器
@@ -63,6 +65,11 @@ func (svr *Server) Init(name string, argv []string) {
 	//初始化插件列表
 	svr.pluginList, svr.disablePluginList = plugin.CreatePluginsList()
 	svr.parserList = parser.CreateParserList()
+
+	//设置端口
+	if svr.port == "" {
+		svr.port = "25565"
+	}
 }
 
 //运行子进程
@@ -70,9 +77,13 @@ func (svr *Server) run_process() {
 	svr.Cmd.Start()
 }
 
+func (svr *Server) Getinfo() string {
+	return fmt.Sprintf("镜像名称：%s\\n,端口：%s\\n", svr.name, svr.port)
+}
+
 //写入日志
 func (svr *Server) WriteLog(level string, msg string) {
-	logFile, err := os.OpenFile(fmt.Sprintf("logs/%s.log", time.Now().Format("2006-01-02")), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+	logFile, err := os.OpenFile(fmt.Sprintf("logs/%s_%s.log", svr.name, time.Now().Format("2006-01-02")), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	defer logFile.Close()
 	if err != nil {
 		fmt.Println("日志写入系统发生错误！ 因为", err)
@@ -105,9 +116,17 @@ func (svr *Server) Restart() {
 	svr.Run()
 }
 
+func (svr *Server) Start(name string, Argv []string) {
+	//初始化
+	svr.Init(name, Argv)
+	//等待加载地图
+	svr.WaitEndLoading()
+	//正式运行MCD
+	svr.Run()
+}
+
 //复制一个镜像服务器（用于镜像启动）
 func (svr *Server) Clone(name string, Argv []string) lib.Server {
-
 	cloneServer := &Server{}
 	// 得到一个可用的端口
 	port, _ := func() (string, bool) {
@@ -116,28 +135,24 @@ func (svr *Server) Clone(name string, Argv []string) lib.Server {
 			return "", false
 		}
 		defer listener.Close()
-
 		addr := listener.Addr().String()
 		_, portString, err := net.SplitHostPort(addr)
 		if err != nil {
 			return "", false
 		}
-
 		return portString, true
 	}()
 	//修改端口
 	cfg, _ := ini.Load("back-up/" + name + "/server.properties")
 	cfg.Section("").NewKey("server-port", port)
-	//初始化
-	cloneServer.Init(name, Argv)
-	//等待加载地图
-	cloneServer.WaitEndLoading()
-	//正式运行MCD
-	cloneServer.Run()
+	cloneServer.port = port
+	cloneServer.Start(name, Argv)
 	return cloneServer
 }
 
 //关闭服务器
 func (svr *Server) Close() {
+	c := container.GetInstance()
+	c.Group.Done()
 	svr.Execute("/stop")
 }

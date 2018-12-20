@@ -1,6 +1,7 @@
 package server
 
 import (
+	"MCDaemon-go/container"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -24,11 +25,11 @@ func (svr *Server) WaitEndLoading() {
 		n, err := svr.Stdout.Read(buffer)
 		retStr = string(buffer[:n])
 		if err != nil {
-			log.Fatalln("服务器启动失败！")
+			log.Fatalln(svr.name, "服务器启动失败！")
 			break
 		}
 		if strings.Contains(retStr, "[Server thread/INFO]: Done") {
-			fmt.Println("服务器地图加载完成!")
+			fmt.Println(svr.name, "服务器地图加载完成!")
 			break
 		}
 	}
@@ -40,6 +41,9 @@ func (svr *Server) Run() {
 	for {
 		n, err := svr.Stdout.Read(buffer)
 		if err != nil {
+			//如果进程已关闭则释放一次镜像同步锁
+			c := container.GetInstance()
+			c.Group.Done()
 			break
 		}
 		var retStr string
@@ -60,7 +64,7 @@ func (svr *Server) Run() {
 			retStr = string(retBt)
 		}
 
-		fmt.Println(retStr)
+		fmt.Println(svr.name, "服务器:", retStr)
 		// 异步处理语法解析器和运行插件
 		go svr.RunParsers(retStr)
 	}

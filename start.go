@@ -20,13 +20,10 @@ func init() {
 func main() {
 	c := container.GetInstance()
 	defaultServer := &server.Server{}
-	//初始化
-	defaultServer.Init("default", MCDeamon)
 	//加入到容器中
 	c.Add("default", defaultServer)
-	//等待加载地图
-	defaultServer.WaitEndLoading()
-	//正式运行MCD
-	defaultServer.Run()
-
+	//开启服务器
+	c.Group.Add(1)
+	go defaultServer.Start("default", MCDeamon)
+	c.Group.Wait()
 }

@@ -8,12 +8,8 @@ import (
 //单例模式
 var (
 	ContainerInstance *Container
-	once              *sync.Once
+	once              sync.Once
 )
-
-func init() {
-	once = &sync.Once{}
-}
 
 //获取单例实例
 func GetInstance() *Container {
@@ -26,7 +22,8 @@ func GetInstance() *Container {
 
 type Container struct {
 	Servers map[string]lib.Server //所有已启动的服务器
-	lock    sync.Mutex
+	lock    sync.Mutex            //同步锁
+	Group   sync.WaitGroup        //协程组同步
 }
 
 func (c *Container) Init() {
