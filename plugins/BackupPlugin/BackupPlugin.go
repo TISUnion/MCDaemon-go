@@ -6,7 +6,9 @@ import (
 	"MCDaemon-go/lib"
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 type BackupPlugin struct {
@@ -14,7 +16,6 @@ type BackupPlugin struct {
 }
 
 func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
-	server_path := config.Cfg.Section("MCDeamon").Key("server_path").String()
 	if len(c.Argv) == 0 {
 		c.Argv = append(c.Argv, "help")
 	}
@@ -26,6 +27,7 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 		bp.backupName = c.Argv[1]
 		s.Execute("/save-all flush")
 	case "saved":
+		server_path := config.Cfg.Section("MCDeamon").Key("server_path").String()
 		if err := Copy(server_path, "back-up/"+bp.backupName); err != nil {
 			fmt.Println(err)
 		}
@@ -34,15 +36,19 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 		if runtime.GOOS == "windows" {
 			s.Tell(c.Player, "windows服务器不支持压缩功能")
 		} else {
-			cmd := exec.Command("tar", "zcvf", "back-up/"+bp.backupName+".tar.gz", "back-up/"+bp.backupName)
+			cmd := exec.Command("tar", "zcvf", fmt.Sprintf("back-up/%s/%s.tar.gz", bp.backupName, bp.backupName), "back-up/"+bp.backupName)
 			if err := cmd.Run(); err != nil {
 				s.Tell(c.Player, fmt.Sprint("压缩姬出问题了，因为", err))
 			} else {
-				s.Tell(c.Player, "备份完成")
+				s.Tell(c.Player, "压缩备份完成")
 			}
 		}
+	case "show":
+		backupfiles, _ := filepath.Glob("back-up/*")
+		text := "备份如下：\\n" + strings.Join(backupfiles, "\\n")
+		s.Tell(c.Player, text)
 	default:
-		text := "使用规则：\\n!!backup save [存档名称]\\nlinux下可使用!!backup compress对最近一次save的存档进行压缩"
+		text := "使用规则：\\n!!backup save [存档名称]\\nlinux下可使用!!backup compress对最近一次save的存档进行压缩\\n!!backup show查看已备份列表"
 		s.Tell(c.Player, text)
 	}
 }
