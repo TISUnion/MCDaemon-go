@@ -15,7 +15,7 @@
 - 运行start(linux/unix)或者start.exe（windows）
 -----
 ## 配置文件
-server_name与server_path决定了服务器启动后生成文件的位置，服务器文件的logs, world等文件都会生成在填写的server_path路径中默认为`minecraft`。server_name则是要运行服务端文件名，默认为`server.jar`
+    server_name与server_path决定了服务器启动后生成文件的位置，服务器文件的logs, world等文件都会生成在填写的server_path路径中默认为`minecraft`。server_name则是要运行服务端文件名，默认为`server.jar`
 -----
 ## 插件编写
 
