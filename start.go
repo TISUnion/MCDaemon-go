@@ -24,6 +24,6 @@ func main() {
 	c.Add("default", defaultServer)
 	//开启服务器
 	c.Group.Add(1)
-	go defaultServer.Start("default", MCDeamon)
+	go defaultServer.Start("default", MCDeamon, config.Cfg.Section("MCDeamon").Key("server_path").String())
 	c.Group.Wait()
 }

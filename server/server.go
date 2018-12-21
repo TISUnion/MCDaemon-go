@@ -17,7 +17,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-ini/ini"
 	"github.com/sirupsen/logrus"
 )
 
@@ -40,10 +39,11 @@ type Server struct {
 }
 
 //根据参数初始化服务器
-func (svr *Server) Init(name string, argv []string) {
+func (svr *Server) Init(name string, argv []string, workDir string) {
+	svr.name = name
 	//创建子进程实例
 	svr.Cmd = exec.Command("java", argv...)
-	svr.Cmd.Dir = config.Cfg.Section("MCDeamon").Key("server_path").String()
+	svr.Cmd.Dir = workDir
 	svr.stdout, err = svr.Cmd.StdoutPipe()
 	if err != nil {
 		log.Fatal(err)
@@ -109,16 +109,16 @@ func (svr *Server) Restart() {
 	//获取所有启动项配置
 	MCDeamon := config.GetStartConfig()
 	//初始化
-	svr.Init(svr.name, MCDeamon)
+	svr.Init(svr.name, MCDeamon, svr.Cmd.Dir)
 	//等待加载地图
 	svr.WaitEndLoading()
 	//正式运行MCD
 	svr.Run()
 }
 
-func (svr *Server) Start(name string, Argv []string) {
+func (svr *Server) Start(name string, Argv []string, workDir string) {
 	//初始化
-	svr.Init(name, Argv)
+	svr.Init(name, Argv, workDir)
 	//等待加载地图
 	svr.WaitEndLoading()
 	//正式运行MCD
@@ -126,7 +126,7 @@ func (svr *Server) Start(name string, Argv []string) {
 }
 
 //复制一个镜像服务器（用于镜像启动）
-func (svr *Server) Clone(name string, Argv []string) lib.Server {
+func (svr *Server) Clone() lib.Server {
 	cloneServer := &Server{}
 	// 得到一个可用的端口
 	port, _ := func() (string, bool) {
@@ -142,12 +142,12 @@ func (svr *Server) Clone(name string, Argv []string) lib.Server {
 		}
 		return portString, true
 	}()
-	//修改端口
-	cfg, _ := ini.Load("back-up/" + name + "/server.properties")
-	cfg.Section("").NewKey("server-port", port)
 	cloneServer.port = port
-	cloneServer.Start(name, Argv)
 	return cloneServer
+}
+
+func (svr *Server) GetPort() string {
+	return svr.port
 }
 
 //关闭服务器
