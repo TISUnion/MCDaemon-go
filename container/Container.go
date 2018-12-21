@@ -1,6 +1,7 @@
 package container
 
 import (
+	"MCDaemon-go/config"
 	"MCDaemon-go/lib"
 	"sync"
 )
@@ -30,10 +31,14 @@ func (c *Container) Init() {
 	c.Servers = make(map[string]lib.Server)
 }
 
-func (c *Container) Add(name string, ls lib.Server) {
+func (c *Container) Add(name string, workDir string, svr lib.Server) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	c.Servers[name] = ls
+	c.Servers[name] = svr
+	//读取配置
+	argv := config.GetStartConfig()
+	c.Group.Add(1)
+	go svr.Start(name, argv, workDir)
 }
 
 func (c *Container) Del(name string) {
@@ -52,4 +57,13 @@ func (c *Container) GetRuntimeServer() []string {
 		res = append(res, k)
 	}
 	return res
+}
+
+func (c *Container) IsRuntime(name string) bool {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if c.Servers[name] != nil {
+		return true
+	}
+	return false
 }
