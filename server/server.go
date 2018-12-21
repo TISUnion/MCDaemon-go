@@ -105,15 +105,12 @@ func (svr *Server) WriteLog(level string, msg string) {
 
 //重启服务器
 func (svr *Server) Restart() {
-	svr.Close()
-	//获取所有启动项配置
-	MCDeamon := config.GetStartConfig()
-	//初始化
-	svr.Init(svr.name, MCDeamon, svr.Cmd.Dir)
-	//等待加载地图
-	svr.WaitEndLoading()
-	//正式运行MCD
-	svr.Run()
+	c := container.GetInstance()
+	//关闭
+	c.Del(svr.name)
+	//启动
+	workDir := svr.Cmd.Dir
+	c.Add(svr.name, workDir, svr)
 }
 
 func (svr *Server) Start(name string, Argv []string, workDir string) {
@@ -146,8 +143,16 @@ func (svr *Server) Clone() lib.Server {
 	return cloneServer
 }
 
+//获取端口
 func (svr *Server) GetPort() string {
 	return svr.port
+}
+
+//以容器形式关闭服务器
+func (svr *Server) CloseInContainer() {
+	c := container.GetInstance()
+	//关闭
+	c.Del(svr.name)
 }
 
 //关闭服务器

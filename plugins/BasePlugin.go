@@ -24,8 +24,7 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 		s.RunUniquePlugin(f)
 	case "stop":
 		fmt.Println("结束")
-		f := s.Close
-		s.RunUniquePlugin(f)
+		s.CloseInContainer()
 	case "reload":
 		f := func() {
 			PluginMap(s.GetPluginList()).GetHotPlugins(true)

@@ -9,6 +9,7 @@ type Server interface {
 	Tell(string, ...interface{})
 	Execute(string)
 	Close()
+	CloseInContainer()
 	Restart()
 	Start(string, []string, string)
 	Getinfo() string
