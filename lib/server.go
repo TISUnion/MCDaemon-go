@@ -5,8 +5,8 @@ import (
 )
 
 type Server interface {
-	Say(string)
-	Tell(string, string)
+	Say(...interface{})
+	Tell(string, ...interface{})
 	Execute(string)
 	Close()
 	Restart()
