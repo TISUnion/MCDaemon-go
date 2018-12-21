@@ -10,8 +10,10 @@ type Server interface {
 	Execute(string)
 	Close()
 	Restart()
+	Start(string, []string, string)
 	Getinfo() string
-	Clone(string, []string) Server
+	Clone() Server
+	GetPort() string
 	RunPlugin(*command.Command)
 	RunUniquePlugin(func())
 	WriteLog(level string, msg string)
