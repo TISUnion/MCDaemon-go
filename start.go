@@ -20,10 +20,7 @@ func init() {
 func main() {
 	c := container.GetInstance()
 	defaultServer := &server.Server{}
-	//加入到容器中
-	c.Add("default", defaultServer)
-	//开启服务器
-	c.Group.Add(1)
-	go defaultServer.Start("default", MCDeamon, config.Cfg.Section("MCDeamon").Key("server_path").String())
+	//加入到容器中并开启服务器
+	c.Add("default", config.Cfg.Section("MCDeamon").Key("server_path").String(), defaultServer)
 	c.Group.Wait()
 }
