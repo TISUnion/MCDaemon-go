@@ -63,7 +63,7 @@ func (svr *Server) Init(name string, argv []string, workDir string) {
 	svr.log.SetLevel(logrus.DebugLevel)
 
 	//初始化插件列表
-	svr.pluginList, svr.disablePluginList = plugin.CreatePluginsList()
+	svr.pluginList, svr.disablePluginList = plugin.CreatePluginsList(false)
 	svr.parserList = parser.CreateParserList()
 
 	//设置端口
@@ -106,13 +106,16 @@ func (svr *Server) WriteLog(level string, msg string) {
 //重启服务器
 func (svr *Server) Restart() {
 	c := container.GetInstance()
+	c.Group.Add(1)
 	//关闭
 	c.Del(svr.name)
 	//启动
 	workDir := svr.Cmd.Dir
 	c.Add(svr.name, workDir, svr)
+	c.Group.Done()
 }
 
+//启动服务器
 func (svr *Server) Start(name string, Argv []string, workDir string) {
 	//初始化
 	svr.Init(name, Argv, workDir)
@@ -120,6 +123,11 @@ func (svr *Server) Start(name string, Argv []string, workDir string) {
 	svr.WaitEndLoading()
 	//正式运行MCD
 	svr.Run()
+}
+
+//重新读取配置文件
+func (svr *Server) ReloadConf() {
+	svr.pluginList, svr.disablePluginList = plugin.CreatePluginsList(true)
 }
 
 //复制一个镜像服务器（用于镜像启动）
@@ -157,7 +165,5 @@ func (svr *Server) CloseInContainer() {
 
 //关闭服务器
 func (svr *Server) Close() {
-	c := container.GetInstance()
-	c.Group.Done()
 	svr.Execute("/stop")
 }
