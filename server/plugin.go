@@ -2,6 +2,7 @@ package server
 
 import (
 	"MCDaemon-go/command"
+	"MCDaemon-go/config"
 	"MCDaemon-go/lib"
 	"fmt"
 	"strings"
@@ -31,11 +32,13 @@ func (svr *Server) RunPlugin(cmd *command.Command) {
 //等待现有插件的完成并停止后面插件的运行，在执行相关操作
 func (svr *Server) RunUniquePlugin(handle func()) {
 	<-svr.pulginPool
-	for i := 0; i < 10; i++ {
+	//根据插件最大并发数进行堵塞
+	maxRunPlugins, _ := config.Cfg.Section("MCDeamon").Key("maxRunPlugins").Int()
+	for i := 0; i < maxRunPlugins; i++ {
 		svr.pulginPool <- 1
 	}
 	handle()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < maxRunPlugins; i++ {
 		<-svr.pulginPool
 	}
 	svr.pulginPool <- 1
