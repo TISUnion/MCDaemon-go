@@ -6,5 +6,6 @@ import "MCDaemon-go/lib"
 func CreateParserList() []lib.Parser {
 	return []lib.Parser{
 		defaultParser{},
+		BackupParser{},
 	}
 }
