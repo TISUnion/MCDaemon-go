@@ -1,5 +1,7 @@
 package plugin
 
+import "MCDaemon-go/plugins/BackupPlugin"
+
 func CreatePluginsList() (PluginMap, PluginMap) {
 	//可使用插件列表
 	PluginsList := make(PluginMap)
@@ -10,8 +12,9 @@ func CreatePluginsList() (PluginMap, PluginMap) {
 	PluginsList.GetHotPlugins(false)
 
 	//注册冷插件
-	PluginsList.RegisterPlugin("!!server", &BasePlugin{})   //基础插件
-	PluginsList.RegisterPlugin("!!yinyinmaster", &Yinyin{}) //例子插件
+	PluginsList.RegisterPlugin("!!server", &BasePlugin{})                //基础插件
+	PluginsList.RegisterPlugin("!!backup", &BackupPlugin.BackupPlugin{}) //备份插件插件
+	PluginsList.RegisterPlugin("!!yinyinmaster", &Yinyin{})              //例子插件
 
 	return PluginsList, DisablePluginsList
 }
