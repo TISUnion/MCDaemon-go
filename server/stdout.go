@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"runtime"
 	"strings"
 	"unicode/utf8"
@@ -25,7 +24,9 @@ func (svr *Server) WaitEndLoading() {
 		n, err := svr.Stdout.Read(buffer)
 		retStr = string(buffer[:n])
 		if err != nil {
-			log.Fatalln(svr.name, "服务器启动失败！")
+			fmt.Println(svr.name, "服务器启动失败！")
+			c := container.GetInstance()
+			c.Group.Done()
 			break
 		}
 		if strings.Contains(retStr, "[Server thread/INFO]: Done") {
