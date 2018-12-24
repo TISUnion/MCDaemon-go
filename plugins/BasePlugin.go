@@ -20,16 +20,12 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 	}
 	switch c.Argv[0] {
 	case "restart":
-		f := s.Restart
-		s.RunUniquePlugin(f)
+		s.Restart()
 	case "stop":
 		fmt.Println("结束")
 		s.CloseInContainer()
 	case "reload":
-		f := func() {
-			PluginMap(s.GetPluginList()).GetHotPlugins(true)
-		}
-		s.RunUniquePlugin(f)
+		s.RunUniquePlugin(s.ReloadConf)
 	case "ban":
 		if len(c.Argv) > 1 {
 			if plugin, ok := PluginMap(s.GetPluginList()).DelPlugin(c.Argv[1]); ok {
