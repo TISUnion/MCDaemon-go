@@ -34,10 +34,10 @@ func (hp *HotPlugin) Handle(c *command.Command, s lib.Server) {
 			s.Say(argv[1])
 		case "tell":
 			if len(argv) >= 3 {
-				s.Tell(argv[2], argv[1])
+				s.Tell(argv[1], strings.Join(argv[2:], ""))
 			}
 		case "Execute":
-			s.Execute(argv[1])
+			s.Execute(strings.Join(argv[1:], ""))
 		}
 	}
 }
