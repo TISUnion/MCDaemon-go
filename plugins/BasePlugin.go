@@ -73,3 +73,6 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 		s.Tell(c.Player, text)
 	}
 }
+
+func (hp *BasePlugin) Init(s lib.Server) {
+}

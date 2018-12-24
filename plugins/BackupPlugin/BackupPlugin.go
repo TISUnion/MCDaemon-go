@@ -52,3 +52,6 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 		s.Tell(c.Player, text)
 	}
 }
+
+func (bp *BackupPlugin) Init(s lib.Server) {
+}

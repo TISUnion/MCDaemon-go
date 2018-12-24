@@ -18,3 +18,6 @@ type Yinyin struct {
 func (hp *Yinyin) Handle(c *command.Command, s lib.Server) {
 	s.Say(fmt.Sprintf("%s对所有人说：嘤嘤嘤！", c.Player))
 }
+
+func (hp *Yinyin) Init(s lib.Server) {
+}
