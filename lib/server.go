@@ -15,6 +15,7 @@ type Server interface {
 	Getinfo() string
 	Clone() Server
 	GetPort() string
+	ReloadConf()
 	RunPlugin(*command.Command)
 	RunUniquePlugin(func())
 	WriteLog(level string, msg string)
