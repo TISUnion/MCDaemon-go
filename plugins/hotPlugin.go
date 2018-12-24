@@ -31,7 +31,7 @@ func (hp *HotPlugin) Handle(c *command.Command, s lib.Server) {
 	if len(argv) >= 2 {
 		switch argv[0] {
 		case "say":
-			s.Say(argv[1])
+			s.Say(strings.Join(argv[1:], ""))
 		case "tell":
 			if len(argv) >= 3 {
 				s.Tell(argv[1], strings.Join(argv[2:], ""))
