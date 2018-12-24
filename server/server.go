@@ -65,7 +65,10 @@ func (svr *Server) Init(name string, argv []string, workDir string) {
 	//初始化插件列表
 	svr.pluginList, svr.disablePluginList = plugin.CreatePluginsList(false)
 	svr.parserList = parser.CreateParserList()
-
+	//执行插件init
+	for _, v := range svr.pluginList {
+		v.Init(svr)
+	}
 	//设置端口
 	if svr.port == "" {
 		svr.port = "25565"
