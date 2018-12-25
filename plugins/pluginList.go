@@ -2,14 +2,14 @@ package plugin
 
 import "MCDaemon-go/plugins/BackupPlugin"
 
-func CreatePluginsList() (PluginMap, PluginMap) {
+func CreatePluginsList(isload bool) (PluginMap, PluginMap) {
 	//可使用插件列表
 	PluginsList := make(PluginMap)
 	//已被禁用插件列表
 	DisablePluginsList := make(PluginMap)
 
 	//加载热插件
-	PluginsList.GetHotPlugins(false)
+	PluginsList.GetHotPlugins(isload)
 
 	//注册冷插件
 	PluginsList.RegisterPlugin("!!server", &BasePlugin{})                //基础插件
