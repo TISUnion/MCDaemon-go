@@ -43,8 +43,8 @@
    输出例子：
    ```text
    say hello everyone  //对所有人说hello everyone
-   tell Alice hello
-   Execute debug start
+   tell Alice hello    //对Alice说hello
+   Execute debug start //启动tps执行
    ```
 - ### 冷插件
    所有冷插件都在plugins文件夹中，包含一个栗子和一个基础插件。
