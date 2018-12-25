@@ -36,6 +36,7 @@ type Server struct {
 	disablePluginList plugin.PluginMap //禁用插件列表
 	parserList        []lib.Parser     //语法解析器列表
 	port              string           //启动服务器端口
+	unqiueLock        sync.Mutex       //堵塞插件执行池锁
 }
 
 //根据参数初始化服务器

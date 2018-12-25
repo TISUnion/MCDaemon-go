@@ -31,6 +31,8 @@ func (svr *Server) RunPlugin(cmd *command.Command) {
 
 //等待现有插件的完成并停止后面插件的运行，在执行相关操作
 func (svr *Server) RunUniquePlugin(handle func()) {
+	svr.unqiueLock.Lock()
+	defer svr.unqiueLock.Unlock()
 	<-svr.pulginPool
 	//根据插件最大并发数进行堵塞
 	maxRunPlugins, _ := config.Cfg.Section("MCDeamon").Key("maxRunPlugins").Int()
