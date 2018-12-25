@@ -11,7 +11,7 @@ import (
 type defaultParser struct{}
 
 //默认语法解析器
-func (c defaultParser) Parsing(word string) (*command.Command, bool) {
+func (c *defaultParser) Parsing(word string) (*command.Command, bool) {
 	re := regexp.MustCompile(`\[\d+:\d+:\d+\]\s+\[Server thread/INFO\]:\s+<(?P<player>.+)>\s+(?P<commond>((!|!!)+.+))\s*`)
 	match := re.FindStringSubmatch(word)
 	groupNames := re.SubexpNames()
