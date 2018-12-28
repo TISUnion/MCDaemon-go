@@ -44,3 +44,6 @@ func (hp *HotPlugin) Handle(c *command.Command, s lib.Server) {
 
 func (hp *HotPlugin) Init(s lib.Server) {
 }
+
+func (hp *HotPlugin) Close() {
+}

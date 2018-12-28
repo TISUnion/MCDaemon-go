@@ -72,3 +72,6 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 
 func (hp *BasePlugin) Init(s lib.Server) {
 }
+
+func (hp *BasePlugin) Close() {
+}

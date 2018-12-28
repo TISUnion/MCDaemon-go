@@ -55,3 +55,6 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 
 func (bp *BackupPlugin) Init(s lib.Server) {
 }
+
+func (bp *BackupPlugin) Close() {
+}

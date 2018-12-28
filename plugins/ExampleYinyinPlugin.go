@@ -21,3 +21,6 @@ func (hp *Yinyin) Handle(c *command.Command, s lib.Server) {
 
 func (hp *Yinyin) Init(s lib.Server) {
 }
+
+func (hp *Yinyin) Close() {
+}
