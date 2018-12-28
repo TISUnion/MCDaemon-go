@@ -60,3 +60,13 @@ func (svr *Server) GetDisablePluginList() map[string]lib.Plugin {
 func (svr *Server) GetParserList() []lib.Parser {
 	return svr.parserList
 }
+
+//调用插件释放资源函数
+func (svr *Server) RunPluginClose() {
+	for _, v := range svr.pluginList {
+		v.Close()
+	}
+	for _, v := range svr.disablePluginList {
+		v.Close()
+	}
+}

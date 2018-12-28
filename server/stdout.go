@@ -1,7 +1,6 @@
 package server
 
 import (
-	"MCDaemon-go/container"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -14,7 +13,7 @@ import (
 )
 
 //等待服务器加载完地图
-func (svr *Server) WaitEndLoading() {
+func (svr *Server) WaitEndLoading() bool {
 	var buffer []byte = make([]byte, 4096)
 	var retStr string
 	//运行子进程
@@ -24,16 +23,15 @@ func (svr *Server) WaitEndLoading() {
 		n, err := svr.Stdout.Read(buffer)
 		retStr = string(buffer[:n])
 		if err != nil {
-			fmt.Println(svr.name, "服务器启动失败！")
-			c := container.GetInstance()
-			c.Group.Done()
-			break
+			fmt.Println(svr.name, "服务器启动失败!")
+			return false
 		}
 		if strings.Contains(retStr, "[Server thread/INFO]: Done") {
 			fmt.Println(svr.name, "服务器地图加载完成!")
 			break
 		}
 	}
+	return true
 }
 
 //正式运行MCD
@@ -42,9 +40,8 @@ func (svr *Server) Run() {
 	for {
 		n, err := svr.Stdout.Read(buffer)
 		if err != nil {
-			//如果进程已关闭则释放一次镜像同步锁
-			c := container.GetInstance()
-			c.Group.Done()
+			//如果进程已关闭则执行关闭函数
+			svr.End()
 			break
 		}
 		var retStr string

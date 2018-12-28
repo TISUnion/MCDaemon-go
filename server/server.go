@@ -124,9 +124,14 @@ func (svr *Server) Start(name string, Argv []string, workDir string) {
 	//初始化
 	svr.Init(name, Argv, workDir)
 	//等待加载地图
-	svr.WaitEndLoading()
-	//正式运行MCD
-	svr.Run()
+	if svr.WaitEndLoading() {
+		//正式运行MCD
+		svr.Run()
+	} else {
+		//没加载成功就释放同步锁
+		c := container.GetInstance()
+		c.Group.Done()
+	}
 }
 
 //重新读取配置文件
@@ -170,4 +175,12 @@ func (svr *Server) CloseInContainer() {
 //关闭服务器
 func (svr *Server) Close() {
 	svr.Execute("/stop")
+}
+
+func (svr *Server) End() {
+	// 关闭插件
+	svr.RunPluginClose()
+	//释放同步锁
+	c := container.GetInstance()
+	c.Group.Done()
 }
