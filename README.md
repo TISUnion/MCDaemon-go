@@ -6,7 +6,7 @@
 
 -----
 ## 开始使用
-- 下载最新的release(beta版不提供)
+- 下载最新的[release](https://github.com/TISUnion/MCDaemon-go/releases)(beta版不提供)
 - 最新版的release默认包含了[插件收录库](https://github.com/TISUnion/MCDaemonPlugins-go)的所有插件
 ### 快速开始
 - 修改配置文件MCD_conig.ini
