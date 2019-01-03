@@ -13,7 +13,7 @@
   - 解压最新版MCDaemon,进入并创建一个minecraft文件夹
   - 将下载MC服务端放入创建的minecraft文件夹内，重命名为server.jar
 - 运行start(linux/unix)或者start.exe（windows）
-- 在游戏中输入!!server show命令来查看可使用的命令
+- 在游戏中输入!!server show list命令来查看可使用的命令
 -----
 ## 配置文件
 ### MCD_conig.ini
