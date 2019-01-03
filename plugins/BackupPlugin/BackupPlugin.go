@@ -45,6 +45,16 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 		}
 	case "show":
 		backupfiles, _ := filepath.Glob("back-up/*")
+		//标记是否启动
+		for k, _ := range backupfiles {
+			var split string
+			if runtime.GOOS == "windows" {
+				split = "\\"
+			} else {
+				split = "/"
+			}
+			backupfiles[k] = strings.Split(backupfiles[k], split)[1]
+		}
 		text := "备份如下：\\n" + strings.Join(backupfiles, "\\n")
 		s.Tell(c.Player, text)
 	default:
