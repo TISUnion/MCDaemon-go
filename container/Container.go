@@ -44,9 +44,11 @@ func (c *Container) Add(name string, workDir string, svr lib.Server) {
 func (c *Container) Del(name string) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	deleteServer := c.Servers[name]
-	deleteServer.RunUniquePlugin(deleteServer.Close)
-	delete(c.Servers, name)
+	if _, ok := c.Servers[name]; ok {
+		deleteServer := c.Servers[name]
+		deleteServer.Close()
+		delete(c.Servers, name)
+	}
 }
 
 func (c *Container) GetRuntimeServer() []string {
@@ -62,7 +64,7 @@ func (c *Container) GetRuntimeServer() []string {
 func (c *Container) IsRuntime(name string) bool {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	if c.Servers[name] != nil {
+	if _, ok := c.Servers[name]; ok {
 		return true
 	}
 	return false
