@@ -174,6 +174,8 @@ func (svr *Server) CloseInContainer() {
 
 //关闭服务器
 func (svr *Server) Close() {
+	// 关闭插件
+	svr.RunPluginClose()
 	svr.Execute("/stop")
 }
 
