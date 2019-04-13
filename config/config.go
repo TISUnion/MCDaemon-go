@@ -17,7 +17,7 @@ var (
 
 func init() {
 	//加载配置文件
-	Cfg, err = ini.Load("MCD_conig.ini")
+	Cfg, err = ini.Load("MCD_conf.ini")
 	if err != nil {
 		fmt.Printf("读取配置文件失败: %v", err)
 		os.Exit(1)
@@ -65,7 +65,7 @@ func GetStartConfig() []string {
 //获取插件配置
 func GetPlugins(is_rebuild bool) map[string]string {
 	if is_rebuild {
-		Cfg, err = ini.Load("MCD_conig.ini")
+		Cfg, err = ini.Load("MCD_conf.ini")
 		if err != nil {
 			fmt.Printf("读取配置文件失败: %v", err)
 			os.Exit(1)

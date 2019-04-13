@@ -9,14 +9,14 @@
 ## 开始使用
 - 下载最新的[release](https://github.com/TISUnion/MCDaemon-go/releases)(beta版不提供)
 ### 快速开始
-- 修改配置文件MCD_conig.ini
+- 修改配置文件MCD_conf.ini
   - 解压最新版MCDaemon,进入并创建一个minecraft文件夹
   - 将下载MC服务端放入创建的minecraft文件夹内，重命名为server.jar
 - 运行start(linux/unix)或者start.exe（windows）
 - 在游戏中输入!!server help命令来查看命令帮助
 -----
 ## 配置文件
-### MCD_conig.ini
+### MCD_conf.ini
 - run_environment：运行方式默认为develop开发者模式（暂时对实际运行没有任何影响）
 - server_name&server_path：决定了服务器启动后生成文件的位置，服务器文件的logs, world等文件都会生成在填写的server_path路径中，默认为`minecraft`。server_name则是要运行服务端文件名，默认为`server.jar`
 - Xms： jvm运行的最小堆内存
@@ -43,7 +43,7 @@
 
 - ### 热插件
    - 将热插件的执行文件放入hotPlugins文件夹中
-   - 在MCD_conig.ini的[plugins]域中注册热插件
+   - 在MCD_conf.ini的[plugins]域中注册热插件
    - 通过如下代码获取插件的命令的参数：
      ```golang
         args := os.Args
