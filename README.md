@@ -5,9 +5,9 @@
 在windows10以及centos7中运行成功
 
 -----
+
 ## 开始使用
 - 下载最新的[release](https://github.com/TISUnion/MCDaemon-go/releases)(beta版不提供)
-- 最新版的release默认包含了[插件收录库](https://github.com/TISUnion/MCDaemonPlugins-go)的所有插件
 ### 快速开始
 - 修改配置文件MCD_conig.ini
   - 解压最新版MCDaemon,进入并创建一个minecraft文件夹
@@ -17,7 +17,7 @@
 -----
 ## 配置文件
 ### MCD_conig.ini
-- run_environment：运行方式默认为develop开发者模式
+- run_environment：运行方式默认为develop开发者模式（暂时对实际运行没有任何影响）
 - server_name&server_path：决定了服务器启动后生成文件的位置，服务器文件的logs, world等文件都会生成在填写的server_path路径中，默认为`minecraft`。server_name则是要运行服务端文件名，默认为`server.jar`
 - Xms： jvm运行的最小堆内存
 - Xmx：jvm最大堆内存
@@ -25,6 +25,20 @@
 - maxRunPlugins：插件最大并发数，默认为`10`，所有插件都是异步运行的，输出是同步输出到服务端。
 - plugins: 该域下填写的都是热插件参数，键为调用插件的命令，值为插件对应的二进制文件名称，`注意`, 二进制文件都在hotPlugins文件夹下
 -----
+
+## MCDaemon的插件收录
+
+> 插件列表
+
+- 基础核心插件：BasePlugin
+- 栗子插件：ExampleYinyinPlugin
+- TPS查看插件：TpsPlugin
+- 沙雕聊天机器人插件：SDChatPlugin
+- 备份插件：BackupPlugin
+- 镜像管理插件：ImagePlugin
+- 加载热插件：hotPlugin
+-----
+
 ## 插件编写
 
 - ### 热插件
@@ -44,10 +58,10 @@
    ```text
    say hello everyone  //对所有人说hello everyone
    tell Alice hello    //对Alice说hello
-   Execute debug start //启动tps执行
+   Execute debug start //执行tps命令
    ```
 - ### 冷插件
-   所有冷插件都在plugins文件夹中，包含一个栗子和一个基础插件。
+   所有冷插件都在plugins文件夹中，包含一个栗子和所有插件。
    
    所有插件需要实现lib包里的Plugin接口，Handle方法为插件的调用方法，当输入命令触发插件时，就会运行该方法。
    例子：
@@ -115,7 +129,7 @@
    ```
 - ### 多服务器镜像
 
-   镜像主要基于备份插件，所以把备份插件合并进了主分支。如果要使用多镜像，需要了解容器，容器代码在container包下的Container.go中，下面介绍如何使用容器：
+   镜像主要基于备份插件，如果要使用多镜像，需要了解容器，容器代码在container包下的Container.go中，下面介绍如何使用容器：
    - container.GetInstance() 获取全局容器实例，这是一个单例，容器原则上整个程序运行时只允许有一个。开发者也可以自己在插件中创建容器实例，但是并不推荐。
    - Add 容器实例的方法，添加一个服务器镜像。第一个参数为镜像名称，用于区分镜像，第二各参数为镜像所在的目录，第三个参数为lib.server接口，用来Clone一个Server实例来承载服务器。
    - Del 关闭一个服务器镜像，传入镜像名称即可

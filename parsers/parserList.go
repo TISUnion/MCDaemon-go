@@ -7,5 +7,7 @@ func CreateParserList() []lib.Parser {
 	return []lib.Parser{
 		&defaultParser{},
 		&BackupParser{},
+		&SDChatParser{},
+		&TpsParser{},
 	}
 }

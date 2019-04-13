@@ -15,6 +15,9 @@ func CreatePluginsList(isload bool) (PluginMap, PluginMap) {
 	PluginsList.RegisterPlugin("!!server", &BasePlugin{})                //基础插件
 	PluginsList.RegisterPlugin("!!backup", &BackupPlugin.BackupPlugin{}) //备份插件插件
 	PluginsList.RegisterPlugin("!!yinyinmaster", &Yinyin{})              //例子插件
+	PluginsList.RegisterPlugin("!!image", &ImagePlugin{})                //镜像插件
+	PluginsList.RegisterPlugin("!!SDChat", &SDChatPlugin{})              //沙雕聊天机器人插件
+	PluginsList.RegisterPlugin("!!tps", &TpsPlugin{})                    //tps插件
 
 	return PluginsList, DisablePluginsList
 }
