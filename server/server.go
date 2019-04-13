@@ -165,6 +165,11 @@ func (svr *Server) GetPort() string {
 	return svr.port
 }
 
+//获取服务器实例名称//获取端口
+func (svr *Server) GetName() string {
+	return svr.name
+}
+
 //以容器形式关闭服务器
 func (svr *Server) CloseInContainer() {
 	c := container.GetInstance()
@@ -179,6 +184,7 @@ func (svr *Server) Close() {
 	svr.Execute("/stop")
 }
 
+//在容器中注销该服务器
 func (svr *Server) End() {
 	// 关闭插件
 	svr.RunPluginClose()
