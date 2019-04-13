@@ -40,7 +40,7 @@ func (svr *Server) Run() {
 	for {
 		n, err := svr.Stdout.Read(buffer)
 		if err != nil {
-			//如果进程已关闭则执行关闭函数
+			//如果进程已关闭则执行容器关闭函数
 			svr.End()
 			break
 		}
