@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package ChatPlugin;
+
+message Message {
+    required    string    ServerName   = 1;
+    required    string    Player   = 2;
+    required    string    Message   = 3;
+    optional    string    ServerNameColor  = 4 [default="#FFFFFF"];
+    optional    string    PlayerColor  = 5 [default="#FFFFFF"];
+    optional    string    MessageColor  = 6 [default="#FFFFFF"];
+}
