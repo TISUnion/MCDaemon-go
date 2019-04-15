@@ -27,13 +27,13 @@ type WSServer struct {
 }
 
 func (this *WSServer) handler(conn *websocket.Conn) {
+	defer conn.Close()
 	var err error
 	for {
 		var reply []byte
 		err = websocket.Message.Receive(conn, &reply)
 		if err != nil {
 			this.minecraftServer.WriteLog("error", fmt.Sprint("聊天服务器出错：", err))
-			conn.Close()
 			break
 		}
 		//将proto消息解码
@@ -41,18 +41,45 @@ func (this *WSServer) handler(conn *websocket.Conn) {
 		err = proto.Unmarshal(reply, newMessage)
 		if err != nil {
 			this.minecraftServer.WriteLog("warn", fmt.Sprint("非法连接：", conn.RemoteAddr().String()))
-			conn.Close()
 			break
 		}
 		serverName := newMessage.GetServerName()
 		//加入到连接池中,若不在聊天白名单中，则关闭连接
 		if ok := this.appendToConnPool(serverName, conn); !ok {
-			conn.Close()
 			break
 		}
 		//将消息加入到接收管道中
 		this.ReceiveMessage <- newMessage
 	}
+}
+
+//向连接池里的所有连接发送消息
+func (this *WSServer) _send() {
+	for {
+		//编码
+		messageObj := <-this.SendMessage
+		data, err := proto.Marshal(messageObj)
+		if err != nil {
+			continue
+		}
+		for serverName, conn := range this.ConnPool {
+			//若出现错误，则从连接池中删除并关闭这条连接
+			if err := websocket.Message.Send(conn, data); err != nil {
+				this.deletePool(serverName)
+				conn.Close()
+				break
+			}
+		}
+	}
+}
+
+//接收要发送的消息
+func (this *WSServer) Send(msg *Message) {
+	this.SendMessage <- msg
+}
+
+func (this *WSServer) Read() *Message {
+	return <-this.ReceiveMessage
 }
 
 //将websocket连接加入到连接池中
@@ -65,22 +92,6 @@ func (this *WSServer) appendToConnPool(serverName string, conn *websocket.Conn) 
 		return true
 	}
 	return false
-}
-
-//发送消息
-func (this *WSServer) sendMessage() {
-	var err error
-	for {
-		messageObj := <-this.SendMessage
-		messageContent := messageObj.GetMessage()
-		for serverName, conn := range this.ConnPool {
-			//若出现错误，则从连接池中删除并关闭这条连接
-			if err = websocket.Message.Send(conn, messageContent); err != nil {
-				this.deletePool(serverName)
-				conn.Close()
-			}
-		}
-	}
 }
 
 func (this *WSServer) readPool(serverName string) (*websocket.Conn, bool) {
