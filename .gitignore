@@ -19,4 +19,5 @@ back-up/*
 start
 *.rar
 *.log
+test.go
 go.sum
