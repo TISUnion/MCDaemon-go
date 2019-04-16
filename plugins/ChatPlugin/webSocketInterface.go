@@ -1,7 +1,7 @@
 package ChatPlugin
 
 type WebSocketRS interface {
-	Start()
-	Send(Message)
-	Read() Message
+	Start() error
+	Send(*Message)
+	Read() *Message
 }

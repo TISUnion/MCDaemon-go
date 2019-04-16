@@ -16,12 +16,12 @@ type WSClient struct {
 	SendMessage     chan *Message   //要发送的消息
 }
 
-func (this *WSClient) Start() {
+func (this *WSClient) Start() error {
 	defer this.ws.Close()
 	var err error
 	this.ws, err = websocket.Dial(this.addr, "", this.origin)
 	if err != nil {
-		return
+		return err
 	}
 	for {
 		msg := make([]byte, 5096)
@@ -37,6 +37,7 @@ func (this *WSClient) Start() {
 		}
 		this.ReceiveMessage <- newMessage
 	}
+	return err
 }
 
 func (this *WSClient) Send(msg *Message) {

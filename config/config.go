@@ -93,7 +93,7 @@ func GetPluginName(cmd string) string {
 func GetPluginCfg(is_rebuild bool) *ini.File {
 	//加载配置文件
 	if PluginCfg == nil || is_rebuild {
-		PluginCfg, err = ini.Load("Plugin_conf.ini")
+		PluginCfg, err = ini.ShadowLoad("Plugin_conf.ini")
 		if err != nil {
 			fmt.Printf("读取插件配置文件失败: %v", err)
 		}
