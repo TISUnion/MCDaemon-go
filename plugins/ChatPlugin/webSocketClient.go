@@ -1,19 +1,17 @@
 package ChatPlugin
 
 import (
-	"MCDaemon-go/lib"
-
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/websocket"
 )
 
 type WSClient struct {
-	addr            string
-	origin          string
-	ws              *websocket.Conn //websocket连接
-	minecraftServer lib.Server      //服务器实例接口
-	ReceiveMessage  chan *Message   //接受到的消息
-	SendMessage     chan *Message   //要发送的消息
+	ServerName     string //服务器名称
+	addr           string
+	origin         string
+	ws             *websocket.Conn //websocket连接
+	ReceiveMessage chan *Message   //接受到的消息
+	SendMessage    chan *Message   //要发送的消息
 }
 
 func (this *WSClient) Start() error {

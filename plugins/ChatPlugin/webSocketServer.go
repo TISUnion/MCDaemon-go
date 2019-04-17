@@ -15,6 +15,7 @@ import (
 )
 
 type WSServer struct {
+	ServerName      string //服务器名称
 	Port            int
 	Suburl          string                     //子路由
 	ReceiveMessage  chan *Message              //接受到的消息
