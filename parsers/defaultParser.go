@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//解析玩家输入文字，判断是否是命令 ， 实现了ParseMachine接口
+//解析玩家输入文字，判断是否是命令 ， 实现了Parser接口
 type defaultParser struct{}
 
 //默认语法解析器
