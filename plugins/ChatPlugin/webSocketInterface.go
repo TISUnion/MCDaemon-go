@@ -3,5 +3,6 @@ package ChatPlugin
 type WebSocketRS interface {
 	Start() error
 	Send(*Message)
-	Read() *Message
+	Read(chan *msgPackage)
+	GetId() int
 }

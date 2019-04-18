@@ -1,17 +1,22 @@
 package ChatPlugin
 
 import (
+	"context"
+
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/websocket"
 )
 
 type WSClient struct {
+	ServerId       int    //服务器id
 	ServerName     string //服务器名称
 	addr           string
 	origin         string
 	ws             *websocket.Conn //websocket连接
 	ReceiveMessage chan *Message   //接受到的消息
 	SendMessage    chan *Message   //要发送的消息
+	Ctx            context.Context //上下文
+	Cancel         context.CancelFunc
 }
 
 func (this *WSClient) Start() error {
@@ -35,6 +40,7 @@ func (this *WSClient) Start() error {
 		}
 		this.ReceiveMessage <- newMessage
 	}
+	this.Cancel()
 	return err
 }
 
@@ -46,6 +52,20 @@ func (this *WSClient) Send(msg *Message) {
 	websocket.Message.Send(this.ws, data)
 }
 
-func (this *WSClient) Read() *Message {
-	return <-this.ReceiveMessage
+func (this *WSClient) Read(packageChan chan *msgPackage) {
+	for {
+		select {
+		case <-this.Ctx.Done():
+			return
+		case msg := <-this.ReceiveMessage:
+			packageChan <- &msgPackage{
+				From: this.ServerId,
+				Msg:  msg,
+			}
+		}
+	}
+}
+
+func (this *WSClient) GetId() int {
+	return this.ServerId
 }

@@ -5,6 +5,7 @@ package ChatPlugin
 
 import (
 	"MCDaemon-go/lib"
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -15,6 +16,7 @@ import (
 )
 
 type WSServer struct {
+	ServerId        int    //服务器id
 	ServerName      string //服务器名称
 	Port            int
 	Suburl          string                     //子路由
@@ -25,6 +27,8 @@ type WSServer struct {
 	ConnPool        map[string]*websocket.Conn //连接池，键为服务器名称，值为websocket连接
 	RWPool          *sync.RWMutex              //连接池读写锁
 	WhiteList       map[string]interface{}     //白名单
+	Ctx             context.Context            //上下文
+	Cancel          context.CancelFunc
 }
 
 func (this *WSServer) handler(conn *websocket.Conn) {
@@ -55,7 +59,7 @@ func (this *WSServer) handler(conn *websocket.Conn) {
 }
 
 //向连接池里的所有连接发送消息
-func (this *WSServer) _send() {
+func (this *WSServer) SendJob() {
 	for {
 		//编码
 		messageObj := <-this.SendMessage
@@ -79,8 +83,18 @@ func (this *WSServer) Send(msg *Message) {
 	this.SendMessage <- msg
 }
 
-func (this *WSServer) Read() *Message {
-	return <-this.ReceiveMessage
+func (this *WSServer) Read(chan *msgPackage) {
+	for {
+		select {
+		case <-this.Ctx.Done():
+			return
+		case msg := <-this.ReceiveMessage:
+			packageChan <- &msgPackage{
+				From: this.ServerId,
+				Msg:  msg,
+			}
+		}
+	}
 }
 
 //将websocket连接加入到连接池中
@@ -124,4 +138,8 @@ func (this *WSServer) Start() error {
 		return err
 	}
 	return nil
+}
+
+func (this *WSServer) GetId() int {
+	return this.ServerId
 }
