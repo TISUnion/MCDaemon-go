@@ -1,6 +1,9 @@
 package plugin
 
-import "MCDaemon-go/plugins/BackupPlugin"
+import (
+	"MCDaemon-go/plugins/BackupPlugin"
+	"MCDaemon-go/plugins/ChatPlugin"
+)
 
 func CreatePluginsList(isload bool) (PluginMap, PluginMap) {
 	//可使用插件列表
@@ -18,6 +21,7 @@ func CreatePluginsList(isload bool) (PluginMap, PluginMap) {
 	PluginsList.RegisterPlugin("!!image", &ImagePlugin{})                //镜像插件
 	PluginsList.RegisterPlugin("!!SDChat", &SDChatPlugin{})              //沙雕聊天机器人插件
 	PluginsList.RegisterPlugin("!!tps", &TpsPlugin{})                    //tps插件
+	PluginsList.RegisterPlugin("!!Chat", &ChatPlugin.ChatPlugin{})       //跨服聊天插件
 
 	return PluginsList, DisablePluginsList
 }

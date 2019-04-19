@@ -3,25 +3,26 @@ package ChatPlugin
 import (
 	"MCDaemon-go/command"
 	"MCDaemon-go/config"
+	"MCDaemon-go/container"
 	"MCDaemon-go/lib"
 	"context"
 	"sync"
 
-	"github.com/go-ini/ini"
 	"golang.org/x/net/websocket"
 )
 
 var (
-	plugincfg    *ini.File
-	WSsvr        *WSServer
-	WSrsPool     []WebSocketRS
-	once         *sync.Once
-	packageChan  chan *msgPackage
-	pluginCtx    context.Context
-	pluginConcel context.CancelFunc
+	WSsvr           *WSServer
+	WSrsPool        []WebSocketRS
+	once            *sync.Once
+	packageChan     chan *msgPackage
+	pluginCtx       context.Context
+	pluginConcel    context.CancelFunc
+	LocalServerName string
 )
 
 const ChanMaxSize int = 20
+const LocalServerId int = -2
 
 func init() {
 	once = &sync.Once{}
@@ -43,7 +44,26 @@ func (this *ChatPlugin) Handle(c *command.Command, s lib.Server) {
 	}
 	switch c.Argv[0] {
 	case "start":
+		command.Group.AddPlayer("ServersChat", c.Player)
 	case "stop":
+		command.Group.DelPlayer("ServersChat", c.Player)
+	case "chat_xxx_say": //发送消息
+		plugincfg := config.GetPluginCfg(false)
+		contentColor := plugincfg.Section("LinkChat").Key("server_content_color").String()
+		playerColor := plugincfg.Section("LinkChat").Key("server_player_color").String()
+		serverColor := plugincfg.Section("LinkChat").Key("server_name_color").String()
+		msg := &Message{
+			ServerName:      &LocalServerName,
+			Player:          &(c.Player),
+			Message:         &(c.Argv[1]),
+			ServerNameColor: &serverColor,
+			PlayerColor:     &playerColor,
+			MessageColor:    &contentColor,
+		}
+		packageChan <- &msgPackage{
+			From: LocalServerId,
+			Msg:  msg,
+		}
 	default:
 		text := "!!Chat start 开启跨服聊天模式\\n!!Chat stop 关闭跨服聊天模式"
 		s.Tell(c.Player, text)
@@ -68,10 +88,11 @@ func (this *ChatPlugin) Close() {
 开启和连接websocket服务器
 */
 func start() {
-	plugincfg = config.GetPluginCfg(true)
+	plugincfg := config.GetPluginCfg(true)
 	isStart, _ := plugincfg.Section("LinkChat").Key("isStart").Bool()
 	whitelistArr := plugincfg.Section("LinkChat.whitelist").Key("whitelist").ValueWithShadows()
 	whitelist := make(map[string]interface{})
+	LocalServerName = plugincfg.Section("LinkChat").Key("server_name").String()
 	for _, v := range whitelistArr {
 		whitelist[v] = 1
 	}
@@ -89,7 +110,7 @@ func start() {
 			ConnPool:       make(map[string]*websocket.Conn),
 			RWPool:         &sync.RWMutex{},
 			WhiteList:      whitelist,
-			ServerName:     plugincfg.Section("LinkChat").Key("server_name").String(),
+			ServerName:     LocalServerName,
 			Ctx:            WSSvrCtx,
 			Cancel:         cancel,
 		}
@@ -135,6 +156,8 @@ func sendNetServer(pkg *msgPackage) {
 	for _, rs := range WSrsPool {
 		//给除接受消息服务器的其他服务器发送
 		if rs.GetId() != pkg.From {
+			serverName := rs.GetName()
+			pkg.Msg.ServerName = &serverName
 			go rs.Send(pkg.Msg)
 		}
 	}
@@ -144,5 +167,19 @@ func sendNetServer(pkg *msgPackage) {
 向本机游戏服务器发送消息
 */
 func sendLocalServer(pkg *msgPackage) {
-
+	if pkg.From != LocalServerId {
+		serverPool := container.GetInstance().Servers
+		for _, server := range serverPool {
+			// 发送给用户组消息
+			players := command.Group.GetPlayer()["ServersChat"]
+			for _, player := range players {
+				server.Tell(player,
+					command.Text{"[" + pkg.Msg.GetServerName() + "]", pkg.Msg.GetServerNameColor()},
+					command.Text{pkg.Msg.GetPlayer(), pkg.Msg.GetPlayerColor()},
+					command.Text{":", "white"},
+					command.Text{pkg.Msg.GetMessage(), pkg.Msg.GetMessageColor()},
+				)
+			}
+		}
+	}
 }

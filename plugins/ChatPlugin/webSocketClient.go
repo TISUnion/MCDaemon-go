@@ -69,3 +69,7 @@ func (this *WSClient) Read(packageChan chan *msgPackage) {
 func (this *WSClient) GetId() int {
 	return this.ServerId
 }
+
+func (this *WSClient) GetName() string {
+	return this.ServerName
+}

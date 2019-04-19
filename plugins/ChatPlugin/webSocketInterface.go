@@ -5,4 +5,5 @@ type WebSocketRS interface {
 	Send(*Message)
 	Read(chan *msgPackage)
 	GetId() int
+	GetName() string
 }

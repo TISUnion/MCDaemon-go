@@ -143,3 +143,7 @@ func (this *WSServer) Start() error {
 func (this *WSServer) GetId() int {
 	return this.ServerId
 }
+
+func (this *WSServer) GetName() string {
+	return this.ServerName
+}
