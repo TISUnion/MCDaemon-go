@@ -27,7 +27,7 @@ func init() {
 		isdevelop = false
 	}
 	//开发时调试使用，是否显示在命令行中
-	printToCmd = true
+	printToCmd = false
 }
 
 //写入开发日志

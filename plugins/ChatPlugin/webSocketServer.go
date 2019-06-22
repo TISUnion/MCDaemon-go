@@ -49,14 +49,14 @@ func (this *WSServer) handler(conn *websocket.Conn) {
 		var reply []byte
 		err = websocket.Message.Receive(conn, &reply)
 		if err != nil {
-			this.minecraftServer.WriteLog("error", fmt.Sprint("聊天服务器出错：", err))
+			lib.WriteDevelopLog("error", fmt.Sprint("聊天服务器出错：", err))
 			break
 		}
 		//将proto消息解码
 		newMessage := &Message{}
 		err = proto.Unmarshal(reply, newMessage)
 		if err != nil {
-			this.minecraftServer.WriteLog("warn", fmt.Sprint("非法连接：", conn.RemoteAddr().String()))
+			lib.WriteDevelopLog("warn", fmt.Sprint("非法连接：", conn.RemoteAddr().String()))
 			break
 		}
 		serverName := newMessage.GetServerName()
@@ -67,7 +67,7 @@ func (this *WSServer) handler(conn *websocket.Conn) {
 				State:      &NotInWhitelist,
 			})
 			websocket.Message.Send(conn, data)
-			this.minecraftServer.WriteLog("warn", fmt.Sprint("不在白名单中：", serverName))
+			lib.WriteDevelopLog("warn", fmt.Sprint("不在白名单中：", serverName))
 			break
 		}
 		fmt.Println("1---", newMessage)
@@ -157,8 +157,7 @@ func (this *WSServer) Start() error {
 	url := "localhost:" + strconv.Itoa(this.Port)
 	http.Handle("/"+this.Suburl, websocket.Handler(this.handler))
 	this.ConnPool = make(map[string]*WSServerClient)
-	fmt.Println(url)
-	fmt.Println("/" + this.Suburl)
+	lib.WriteDevelopLog("info", fmt.Sprint("websocket启动，连接地址：", url, "/", this.Suburl))
 	go http.ListenAndServe(url, nil)
 	this.Alive = true
 	return nil
