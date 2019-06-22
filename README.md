@@ -37,6 +37,7 @@
 - 备份插件：BackupPlugin
 - 镜像管理插件：ImagePlugin
 - 加载热插件：hotPlugin
+- 多服务器聊天插件：ChatPlugin
 -----
 
 ## 插件编写
@@ -107,6 +108,10 @@
 -----   
 
 ## 高级组件
+- ### 打印调试信息
+   编写插件时，总是需要查看一些调试信息，在lib包下的log中提供了WriteDevelopLog和WriteRuntimeLog两个函数打印相关日志，
+   WriteDevelopLog是写入开发调试信息在logs/develop.log中，写入还需要在MCD_conf.ini中把运行环境配置run_environment改成develop,
+   如果觉得看日志很繁琐，还可以修改lib包下log中的printToCmd来使信息显示在命令行上。而WriteRuntimeLog是运行时日志，按日来划分文件。
 - ### 自定义语法解释器
    所有语法解释器都在parsers中，所有解释器需要实现lib中的Parser接口。
    
