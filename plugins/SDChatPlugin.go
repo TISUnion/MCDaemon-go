@@ -79,13 +79,13 @@ func httpPost(data string) string {
 		strings.NewReader(data),
 	)
 	if err != nil {
-		fmt.Println(err)
+		lib.WriteDevelopLog("error", err.Error())
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
+		lib.WriteDevelopLog("error", err.Error())
 	}
 
 	return string(body)

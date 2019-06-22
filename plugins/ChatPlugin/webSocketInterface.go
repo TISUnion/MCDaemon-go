@@ -3,7 +3,8 @@ package ChatPlugin
 type WebSocketRS interface {
 	Start() error
 	Send(*Message)
-	Read(chan *msgPackage)
+	Read()
 	GetId() int
 	GetName() string
+	IsAlive() bool
 }

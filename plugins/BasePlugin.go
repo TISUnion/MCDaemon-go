@@ -8,7 +8,6 @@ package plugin
 import (
 	"MCDaemon-go/command"
 	"MCDaemon-go/lib"
-	"fmt"
 )
 
 type BasePlugin struct {
@@ -22,7 +21,7 @@ func (hp *BasePlugin) Handle(c *command.Command, s lib.Server) {
 	case "restart":
 		s.Restart()
 	case "stop":
-		fmt.Println("结束")
+		lib.WriteDevelopLog("info", "关闭服务器")
 		s.CloseInContainer()
 	case "reload":
 		s.RunUniquePlugin(s.ReloadConf)

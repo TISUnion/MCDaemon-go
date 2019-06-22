@@ -4,9 +4,10 @@ package ChatPlugin;
 
 message Message {
     required    string    ServerName   = 1;
-    required    string    Player   = 2;
-    required    string    Message   = 3;
+    optional    string    Player   = 2;
+    optional    string    Message   = 3;
     optional    string    ServerNameColor  = 4 [default="white"];
     optional    string    PlayerColor  = 5 [default="white"];
     optional    string    MessageColor  = 6 [default="white"];
+    optional    int64       state = 7;
 }

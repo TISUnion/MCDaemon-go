@@ -11,13 +11,9 @@ import (
 	"io"
 	"log"
 	"net"
-	"os"
 	"os/exec"
 	"strconv"
 	"sync"
-	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 var err error
@@ -31,7 +27,6 @@ type Server struct {
 	lock              sync.Mutex       //输入管道同步锁
 	pulginPool        chan interface{} //插件池
 	maxRunPlugins     int              //插件最大并发数
-	log               *logrus.Logger   //日志文件
 	pluginList        plugin.PluginMap //插件列表
 	disablePluginList plugin.PluginMap //禁用插件列表
 	parserList        []lib.Parser     //语法解析器列表
@@ -59,10 +54,6 @@ func (svr *Server) Init(name string, argv []string, workDir string) {
 	svr.maxRunPlugins, _ = strconv.Atoi(config.Cfg.Section("MCDeamon").Key("maxRunPlugins").String())
 	svr.pulginPool = make(chan interface{}, svr.maxRunPlugins)
 
-	//初始化日志类
-	svr.log = logrus.New()
-	svr.log.SetLevel(logrus.DebugLevel)
-
 	//初始化插件列表
 	svr.pluginList, svr.disablePluginList = plugin.CreatePluginsList(false)
 	svr.parserList = parser.CreateParserList()
@@ -87,24 +78,7 @@ func (svr *Server) Getinfo() string {
 
 //写入日志
 func (svr *Server) WriteLog(level string, msg string) {
-	logFile, err := os.OpenFile(fmt.Sprintf("logs/%s_%s.log", svr.name, time.Now().Format("2006-01-02")), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
-	defer logFile.Close()
-	if err != nil {
-		fmt.Println("日志写入系统发生错误！ 因为", err)
-	}
-	svr.log.SetOutput(logFile)
-	switch level {
-	case "debug":
-		svr.log.Debug(msg)
-	case "info":
-		svr.log.Info(msg)
-	case "warn":
-		svr.log.Warn(msg)
-	case "error":
-		svr.log.Error(msg)
-	case "fatal":
-		svr.log.Fatal(msg)
-	}
+	lib.WriteRuntimeLog(level, msg, svr.name)
 }
 
 //重启服务器

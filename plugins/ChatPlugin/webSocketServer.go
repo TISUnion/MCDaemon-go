@@ -15,25 +15,36 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+var clientID = 10000
+
+type WSServerClient struct {
+	ServerId int //服务器id
+	Conn     *websocket.Conn
+}
+
 type WSServer struct {
 	ServerId        int    //服务器id
 	ServerName      string //服务器名称
 	Port            int
 	Suburl          string                     //子路由
-	ReceiveMessage  chan *Message              //接受到的消息
+	ReceiveMessage  chan *msgPackage           //接受到的消息
 	SendMessage     chan *Message              //要发送的消息
 	origin          string                     //源地址
 	minecraftServer lib.Server                 //服务器实例接口
-	ConnPool        map[string]*websocket.Conn //连接池，键为服务器名称，值为websocket连接
+	ConnPool        map[string]*WSServerClient //连接池，键为服务器名称，值为封装的websocket连接对象
 	RWPool          *sync.RWMutex              //连接池读写锁
 	WhiteList       map[string]interface{}     //白名单
 	Ctx             context.Context            //上下文
 	Cancel          context.CancelFunc
+	Alive           bool //是否是活跃连接
 }
 
 func (this *WSServer) handler(conn *websocket.Conn) {
+	fmt.Println("聊天服务器连接成功")
 	defer conn.Close()
 	var err error
+	clientID = clientID + 1
+	Cilent := &WSServerClient{clientID, conn}
 	for {
 		var reply []byte
 		err = websocket.Message.Receive(conn, &reply)
@@ -50,66 +61,78 @@ func (this *WSServer) handler(conn *websocket.Conn) {
 		}
 		serverName := newMessage.GetServerName()
 		//加入到连接池中,若不在聊天白名单中，则关闭连接
-		if ok := this.appendToConnPool(serverName, conn); !ok {
+		if ok := this.appendToConnPool(serverName, Cilent); !ok {
+			data, _ := proto.Marshal(&Message{
+				ServerName: &LocalServerName,
+				State:      &NotInWhitelist,
+			})
+			websocket.Message.Send(conn, data)
+			this.minecraftServer.WriteLog("warn", fmt.Sprint("不在白名单中：", serverName))
 			break
 		}
+		fmt.Println("1---", newMessage)
+		if newMessage.GetState() == FirstTouch {
+			fmt.Println("1---", newMessage)
+			continue
+		}
+		//将消息发送给其他连接
+		clientMsg := &msgPackage{Cilent.ServerId, newMessage}
+		this.SendtoClient(clientMsg)
 		//将消息加入到接收管道中
-		this.ReceiveMessage <- newMessage
+		ServerMsg := &msgPackage{LocalServerId, newMessage}
+		this.ReceiveMessage <- ServerMsg
 	}
 }
 
 //向连接池里的所有连接发送消息
-func (this *WSServer) SendJob() {
-	for {
-		//编码
-		messageObj := <-this.SendMessage
-		data, err := proto.Marshal(messageObj)
-		if err != nil {
+func (this *WSServer) SendtoClient(msg *msgPackage) {
+	//编码
+	data, _ := proto.Marshal(msg.Msg)
+	for serverName, client := range this.ConnPool {
+		//如果serverid相同，则不发送
+		if client.ServerId == msg.From {
 			continue
 		}
-		for serverName, conn := range this.ConnPool {
-			//若出现错误，则从连接池中删除并关闭这条连接
-			if err := websocket.Message.Send(conn, data); err != nil {
-				this.deletePool(serverName)
-				conn.Close()
-				break
-			}
+		//若出现错误，则从连接池中删除并关闭这条连接
+		fmt.Println("向子连接发送", client.ServerId, "------", msg.From)
+		if err := websocket.Message.Send(client.Conn, data); err != nil {
+			this.deletePool(serverName)
+			client.Conn.Close()
+			break
 		}
 	}
 }
 
 //接收要发送的消息
 func (this *WSServer) Send(msg *Message) {
-	this.SendMessage <- msg
+	this.SendtoClient(&msgPackage{LocalServerId, msg})
 }
 
-func (this *WSServer) Read(chan *msgPackage) {
+func (this *WSServer) Read() {
 	for {
 		select {
 		case <-this.Ctx.Done():
+			fmt.Println("server context over!")
 			return
 		case msg := <-this.ReceiveMessage:
-			packageChan <- &msgPackage{
-				From: this.ServerId,
-				Msg:  msg,
-			}
+			packageChan <- msg
 		}
 	}
 }
 
 //将websocket连接加入到连接池中
-func (this *WSServer) appendToConnPool(serverName string, conn *websocket.Conn) bool {
+func (this *WSServer) appendToConnPool(serverName string, Client *WSServerClient) bool {
 	if _, ok := this.WhiteList[serverName]; ok {
 		//如果没有进入连接池，则加入到连接池中
 		if _, ok := this.readPool(serverName); !ok {
-			this.writePool(serverName, conn)
+			this.writePool(serverName, Client)
 		}
 		return true
 	}
 	return false
 }
 
-func (this *WSServer) readPool(serverName string) (*websocket.Conn, bool) {
+func (this *WSServer) readPool(serverName string) (*WSServerClient, bool) {
 	this.RWPool.RLock()
 	defer this.RWPool.RUnlock()
 	if val, ok := this.ConnPool[serverName]; ok {
@@ -118,10 +141,10 @@ func (this *WSServer) readPool(serverName string) (*websocket.Conn, bool) {
 	return nil, false
 }
 
-func (this *WSServer) writePool(serverName string, conn *websocket.Conn) {
+func (this *WSServer) writePool(serverName string, Client *WSServerClient) {
 	this.RWPool.Lock()
 	defer this.RWPool.Unlock()
-	this.ConnPool[serverName] = conn
+	this.ConnPool[serverName] = Client
 }
 
 func (this *WSServer) deletePool(serverName string) {
@@ -133,10 +156,11 @@ func (this *WSServer) deletePool(serverName string) {
 func (this *WSServer) Start() error {
 	url := "localhost:" + strconv.Itoa(this.Port)
 	http.Handle("/"+this.Suburl, websocket.Handler(this.handler))
-	err := http.ListenAndServe(url, nil)
-	if err != nil {
-		return err
-	}
+	this.ConnPool = make(map[string]*WSServerClient)
+	fmt.Println(url)
+	fmt.Println("/" + this.Suburl)
+	go http.ListenAndServe(url, nil)
+	this.Alive = true
 	return nil
 }
 
@@ -146,4 +170,12 @@ func (this *WSServer) GetId() int {
 
 func (this *WSServer) GetName() string {
 	return this.ServerName
+}
+
+func (this *WSServer) IsAlive() bool {
+	if this.Alive {
+		return true
+	}
+	this.Cancel()
+	return false
 }
