@@ -54,7 +54,6 @@ func GetStartConfig() []string {
 		xms,
 		"-jar",
 		serverName,
-		"-Dfile.encoding=UTF-8",
 	}
 	if gui != "true" {
 		result = append(result, "nogui")
