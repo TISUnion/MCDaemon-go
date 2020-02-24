@@ -12,5 +12,6 @@ require (
 	github.com/tidwall/pretty v1.0.0 // indirect
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	golang.org/x/text v0.3.2
+	golang.org/x/tools/gopls v0.3.2 // indirect
 	gopkg.in/ini.v1 v1.42.0 // indirect
 )

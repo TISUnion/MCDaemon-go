@@ -49,9 +49,16 @@ func GetStartConfig() []string {
 		}
 		return in
 	})
+	agent := Section.Key("agent").Validate(func(in string) string {
+		if len(in) == 0 {
+			return " "
+		}
+		return fmt.Sprint("-javaagent:{", in, "}=https://littleskin.cn/api/yggdrasil")
+	})
 	result := []string{
 		xmx,
 		xms,
+		agent,
 		"-jar",
 		serverName,
 	}
