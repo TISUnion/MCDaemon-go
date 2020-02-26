@@ -1,5 +1,5 @@
 /*
- * 自动定时备份插件
+ * 自动定时备份插件（仅限Linux，在Ubuntu18.04通过测试）
  * 定时运行：rsync -a --delete minecraft/ back-up/auto
  * 他会对所有人说：嘤嘤嘤
  */
@@ -10,6 +10,8 @@ import (
 	"MCDaemon-go/command"
 	"MCDaemon-go/lib"
 	"fmt"
+	"os"
+	"time"
 )
 
 type AutoBackup struct {
@@ -30,6 +32,20 @@ func (hp *AutoBackup) Handle(c *command.Command, s lib.Server) {
 		s.Tell(c.Player, command.Text{"本插件还未完工！", "red"})
 
 	case "query":
+		lastTime, strerr := GetFileModTime("back-up/auto")
+		currentTime := time.Now()
+		printTime := "上次存档："
+		if len(strerr) > 0 {
+			s.Tell(c.Player, command.Text{strerr, "red"})
+		} else {
+			if currentTime.Year() != lastTime.Year() {
+				printTime += fmt.Sprintf("%d年", lastTime.Year())
+			}
+
+			printTime += fmt.Sprintf("%d月%d日%d时%d分", lastTime.Month(), lastTime.Day(), lastTime.Hour(), lastTime.Minute())
+			s.Tell(c.Player, command.Text{printTime, "yellow"})
+		}
+
 		s.Tell(c.Player, command.Text{"本插件还未完工！", "red"})
 
 	default:
@@ -41,7 +57,24 @@ func (hp *AutoBackup) Handle(c *command.Command, s lib.Server) {
 	}
 }
 
+// GetFileModTime ：获取文件修改时间 返回时间
+func GetFileModTime(path string) (t time.Time, strerr string) {
+	f, err := os.Open(path)
+	if err != nil {
+		return time.Now(), "open file error"
+	}
+	defer f.Close()
+
+	fi, err := f.Stat()
+	if err != nil {
+		return time.Now(), "stat fileinfo error"
+	}
+
+	return fi.ModTime(), ""
+}
+
 func (hp *AutoBackup) Init(s lib.Server) {
+	fmt.Println("ooooooh!")
 }
 
 func (hp *AutoBackup) Close() {
