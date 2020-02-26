@@ -25,7 +25,7 @@ func (hp *AutoBackup) Handle(c *command.Command, s lib.Server) {
 		if len(c.Argv) < 2 {
 			s.Tell(c.Player, command.Text{"请输入要设定的小时数！", "red"})
 		} else {
-			s.Tell(c.Player, command.Text{fmt.Sprintf("收到参数%d", c.Argv[1]), "green"})
+			s.Tell(c.Player, command.Text{fmt.Sprintf("收到参数%s", c.Argv[1]), "green"})
 		}
 		s.Tell(c.Player, command.Text{"本插件还未完工！", "red"})
 
@@ -34,9 +34,9 @@ func (hp *AutoBackup) Handle(c *command.Command, s lib.Server) {
 
 	default:
 		set1 := command.Text{"!!autobk set [小时数]", "white"}
-		set2 := command.Text{"设定存档间隔\\n", "green"}
+		set2 := command.Text{"设定存档间隔\n", "green"}
 		query1 := command.Text{"!!autobk query", "white"}
-		query2 := command.Text{"查询上次存档时间\\n", "green"}
+		query2 := command.Text{"查询上次存档时间\n", "green"}
 		s.Tell(c.Player, set1, set2, query1, query2)
 	}
 }
