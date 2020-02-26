@@ -10,6 +10,7 @@ require (
 	github.com/tidwall/gjson v1.2.1
 	github.com/tidwall/match v1.0.1 // indirect
 	github.com/tidwall/pretty v1.0.0 // indirect
+	github.com/uudashr/gopkgs/v2 v2.1.2 // indirect
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 	golang.org/x/text v0.3.2
 	golang.org/x/tools/gopls v0.3.2 // indirect

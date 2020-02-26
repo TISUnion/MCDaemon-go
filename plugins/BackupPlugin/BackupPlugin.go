@@ -23,9 +23,10 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 	case "save":
 		if len(c.Argv) < 2 {
 			s.Tell(c.Player, "请输入备份存档名称！")
+		} else {
+			bp.backupName = c.Argv[1]
+			s.Execute("/save-all flush")
 		}
-		bp.backupName = c.Argv[1]
-		s.Execute("/save-all flush")
 	case "saved":
 		server_path := config.Cfg.Section("MCDeamon").Key("server_path").String()
 		if err := Copy(server_path, "back-up/"+bp.backupName); err != nil {
