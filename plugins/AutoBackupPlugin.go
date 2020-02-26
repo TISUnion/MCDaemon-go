@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -44,7 +45,7 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 		}
 
 	case "query":
-		lastTime, strerr := GetFileModTime("back-up/auto")
+		lastTime, strerr := GetFileChangeTime("back-up/auto")
 		currentTime := time.Now()
 		printTime := "上次存档："
 		if len(strerr) > 0 {
@@ -65,7 +66,7 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 
 	case "save":
 		if ab.interval > 0 && len(ab.workdir) > 0 {
-			lastTime, strerr := GetFileModTime("back-up/auto")
+			lastTime, strerr := GetFileChangeTime("back-up/auto")
 			currentTime := time.Now()
 			if len(strerr) > 0 {
 				s.Tell(c.Player, command.Text{strerr, "red"})
@@ -76,8 +77,10 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 				err := cmd.Run()
 				if err != nil {
 					s.Say(command.Text{fmt.Sprintf("备份错误：%s", err), "red"})
+					fmt.Println(fmt.Sprintf("备份错误：%s", err))
 				} else {
 					s.Say(command.Text{"备份完毕", "green"})
+					fmt.Println("备份完毕")
 				}
 			}
 		}
@@ -91,8 +94,8 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 	}
 }
 
-// GetFileModTime ：获取文件修改时间 返回时间
-func GetFileModTime(path string) (t time.Time, strerr string) {
+// GetFileChangeTime ：获取文件修改时间 返回时间
+func GetFileChangeTime(path string) (t time.Time, strerr string) {
 	f, err := os.Open(path)
 	if err != nil {
 		return time.Now(), "open file error"
@@ -104,7 +107,13 @@ func GetFileModTime(path string) (t time.Time, strerr string) {
 		return time.Now(), "stat fileinfo error"
 	}
 
-	return fi.ModTime(), ""
+	filestat := fi.Sys().(*syscall.Stat_t)
+	return timespecToTime(filestat.Atim), ""
+}
+
+// timespecToTime ：将获取到的元信息时间转为Time
+func timespecToTime(ts syscall.Timespec) time.Time {
+	return time.Unix(int64(ts.Sec), int64(ts.Nsec))
 }
 
 func (ab *AutoBackup) Init(s lib.Server) {
