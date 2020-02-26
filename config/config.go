@@ -49,11 +49,33 @@ func GetStartConfig() []string {
 		}
 		return in
 	})
-	result := []string{
-		xmx,
-		xms,
-		"-jar",
-		serverName,
+	agent := Section.Key("agent").Validate(func(in string) string {
+		url := Section.Key("yggdrasil-url").Value()
+		if len(in) == 0 {
+			return ""
+		}
+		if len(url) == 0 {
+			fmt.Println("未指定 yggdrasil-url！不会启用 -javaagent 参数")
+			return ""
+		}
+		return fmt.Sprint("-javaagent:", in, "=", url)
+	})
+	var result []string
+	if len(agent) == 0 {
+		result = []string{
+			xmx,
+			xms,
+			"-jar",
+			serverName,
+		}
+	} else {
+		result = []string{
+			xmx,
+			xms,
+			agent,
+			"-jar",
+			serverName,
+		}
 	}
 	if gui != "true" {
 		result = append(result, "nogui")
