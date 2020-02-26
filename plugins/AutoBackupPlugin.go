@@ -38,6 +38,7 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 				s.Tell(c.Player, command.Text{"请输入自然数！", "red"})
 			} else if interval_new == 0 {
 				s.Say(command.Text{"自动存档关闭！", "yellow"})
+				ab.interval = interval_new
 			} else {
 				s.Say(command.Text{fmt.Sprintf("自动存档间隔设为%d小时", interval_new), "yellow"})
 				ab.interval = interval_new
