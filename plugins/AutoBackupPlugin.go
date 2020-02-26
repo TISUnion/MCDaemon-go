@@ -6,22 +6,22 @@
 
  package plugin
 
- import 
+ import (
 	"MCDaemon-go/command"
 	"MCDaemon-go/lib"
 	"fmt"
 )
  
- type Yinyin struct {
+ type AutoBackup struct {
  }
  
- func (hp *Yinyin) Handle(c *command.Command, s lib.Server) {
+ func (hp *AutoBackup) Handle(c *command.Command, s lib.Server) {
 	 s.Say(fmt.Sprintf("%s对所有人说：嘤嘤嘤！", c.Player))
  }
  
- func (hp *Yinyin) Init(s lib.Server) {
+ func (hp *AutoBackup) Init(s lib.Server) {
  }
  
- func (hp *Yinyin) Close() {
+ func (hp *AutoBackup) Close() {
  }
  
