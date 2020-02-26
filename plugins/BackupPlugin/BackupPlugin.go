@@ -23,9 +23,10 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 	case "save":
 		if len(c.Argv) < 2 {
 			s.Tell(c.Player, "请输入备份存档名称！")
+		} else {
+			bp.backupName = c.Argv[1]
+			s.Execute("/save-all flush")
 		}
-		bp.backupName = c.Argv[1]
-		s.Execute("/save-all flush")
 	case "saved":
 		server_path := config.Cfg.Section("MCDeamon").Key("server_path").String()
 		if err := Copy(server_path, "back-up/"+bp.backupName); err != nil {
@@ -58,7 +59,7 @@ func (bp *BackupPlugin) Handle(c *command.Command, s lib.Server) {
 		text := "备份如下：\\n" + strings.Join(backupfiles, "\\n")
 		s.Tell(c.Player, text)
 	default:
-		text := "使用规则：\\n!!backup save [存档名称]\\nlinux下可使用!!backup compress对最近一次save的存档进行压缩\\n!!backup show查看已备份列表"
+		text := "使用规则：\\n!!backup save [存档名称(最好是日期)]\\nlinux下可使用!!backup compress对最近一次save的存档进行压缩\\n!!backup show查看已备份列表"
 		s.Tell(c.Player, text)
 	}
 }
