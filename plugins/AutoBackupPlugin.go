@@ -42,7 +42,6 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 				ab.interval = interval_new
 			}
 		}
-		s.Tell(c.Player, command.Text{"本插件还未完工！", "red"})
 
 	case "query":
 		lastTime, strerr := GetFileModTime("back-up/auto")
@@ -63,8 +62,6 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 		} else {
 			s.Tell(c.Player, command.Text{"自动备份已关闭", "yellow"})
 		}
-
-		s.Tell(c.Player, command.Text{"本插件还未完工！", "red"})
 
 	case "save":
 		if ab.interval > 0 && len(ab.workdir) > 0 {
