@@ -40,7 +40,7 @@ func (hp *SDChatPlugin) Handle(c *command.Command, s lib.Server) {
 		_ = config.GetPluginCfg(true)
 		s.Tell(c.Player, "已重新读取配置文件")
 	default:
-		text := "!!SDChat all start 开启全局聊天模式\\n!!SDChat start 开启私聊模式（别的玩家看不见沙雕机器人给你发的信息）\\n!!SDChat stop 关闭聊天模式"
+		text := "!!SDChat all start 开启全局聊天模式\\n!!SDChat start 开启私聊模式（别的玩家看不见沙雕机器人给你发的信息）\\n!!SDChat stop 关闭聊天模式\\n!!SDChat reload 重新加载配置文件"
 		s.Tell(c.Player, text)
 	}
 }

@@ -10,5 +10,6 @@ func CreateParserList() []lib.Parser {
 		&defaultParser{},
 		&BackupParser{},
 		&TpsParser{},
+		&AutoBackupParser{},
 	}
 }

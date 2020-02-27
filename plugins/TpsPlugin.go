@@ -23,7 +23,7 @@ func (hp *TpsPlugin) Handle(c *command.Command, s lib.Server) {
 	} else if c.Argv[0] == "res" {
 		s.Say(c.Argv[1][:len(c.Argv[1])-1])
 	} else {
-		text := "使用 !!tps [秒数] 指定获取多少秒内的tps"
+		text := "使用 !!tps [秒数] 指定获取多少秒内的tps（自动限幅30s内）"
 		s.Tell(c.Player, text)
 	}
 }
