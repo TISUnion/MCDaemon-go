@@ -73,16 +73,25 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 				s.Tell(c.Player, command.Text{strerr, "red"})
 			} else if currentTime.Unix()-lastTime.Unix() > int64(ab.interval*3600) {
 				s.Say(command.Text{"开始自动备份...", "yellow"})
-
-				cmd := exec.Command("rsync", "-a", "--delete", ab.workdir+"/", "back-up/auto")
-				err := cmd.Run()
-				if err != nil {
-					s.Say(command.Text{fmt.Sprintf("备份错误：%s", err), "red"})
-					fmt.Println(fmt.Sprintf("备份错误：%s", err))
+				// 将上次备份转存
+				cmdlast := exec.Command("rsync", "-a", "--delete", "back-up/auto", "back-up/auto-last")
+				errlast := cmdlast.Run()
+				if errlast != nil {
+					s.Say(command.Text{fmt.Sprintf("备份错误：%s", errlast), "red"})
+					fmt.Println(fmt.Sprintf("备份错误：%s", errlast))
 				} else {
-					s.Say(command.Text{"备份完毕", "green"})
-					fmt.Println("备份完毕")
+					// 备份当前存档
+					cmd := exec.Command("rsync", "-a", "--delete", ab.workdir+"/", "back-up/auto")
+					err := cmd.Run()
+					if err != nil {
+						s.Say(command.Text{fmt.Sprintf("备份错误：%s", err), "red"})
+						fmt.Println(fmt.Sprintf("备份错误：%s", err))
+					} else {
+						s.Say(command.Text{"备份完毕", "green"})
+						fmt.Println("备份完毕")
+					}
 				}
+
 			}
 		}
 
