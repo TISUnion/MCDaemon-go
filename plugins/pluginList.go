@@ -23,6 +23,6 @@ func CreatePluginsList(isload bool) (PluginMap, PluginMap) {
 	PluginsList.RegisterPlugin("!!tps", &TpsPlugin{})                    //tps插件
 	PluginsList.RegisterPlugin("!!Chat", &ChatPlugin.ChatPlugin{})       //跨服聊天插件
 	PluginsList.RegisterPlugin("!!autobk", &AutoBackup{})                // 自动备份插件
-
+	PluginsList.RegisterPlugin("!!Warn", &WarnPlugin{})                  // 警告信息插件
 	return PluginsList, DisablePluginsList
 }
