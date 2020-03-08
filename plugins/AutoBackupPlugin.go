@@ -65,6 +65,10 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 		}
 
 	case "save":
+		if len(c.Argv) > 1 {
+			s.WriteLog("info", fmt.Sprintf("玩家 %s 下线了", c.Argv[1]))
+		}
+
 		if ab.interval > 0 && len(ab.workdir) > 0 {
 			lastTime, strerr := GetFileChangeTime("back-up/auto")
 			currentTime := time.Now()
@@ -72,7 +76,7 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 				s.Tell(c.Player, command.Text{strerr, "red"})
 			} else if currentTime.Unix()-lastTime.Unix() > int64(ab.interval*3600) {
 				s.Say(command.Text{"开始自动备份...", "yellow"})
-				// 将上次备份转存
+				// 冗余备份
 				cmdlast := exec.Command("rsync", "-a", "--delete", "back-up/auto/", "back-up/auto-last")
 				errlast := cmdlast.Run()
 				if errlast != nil {
