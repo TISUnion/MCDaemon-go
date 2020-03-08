@@ -74,7 +74,7 @@ func (ab *AutoBackup) Handle(c *command.Command, s lib.Server) {
 			} else if currentTime.Unix()-lastTime.Unix() > int64(ab.interval*3600) {
 				s.Say(command.Text{"开始自动备份...", "yellow"})
 				// 将上次备份转存
-				cmdlast := exec.Command("rsync", "-a", "--delete", "back-up/auto", "back-up/auto-last")
+				cmdlast := exec.Command("rsync", "-a", "--delete", "back-up/auto/", "back-up/auto-last")
 				errlast := cmdlast.Run()
 				if errlast != nil {
 					s.Say(command.Text{fmt.Sprintf("备份错误：%s", errlast), "red"})
