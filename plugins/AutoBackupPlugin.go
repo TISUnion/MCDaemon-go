@@ -1,7 +1,6 @@
 /*
  * 自动增量备份插件（仅限Linux，在Ubuntu18.04通过测试）
  * 定时运行：rsync -a --delete minecraft/ back-up/auto
- * 他会对所有人说：嘤嘤嘤
  */
 
 package plugin
