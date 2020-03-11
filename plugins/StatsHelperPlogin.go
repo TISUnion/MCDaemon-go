@@ -22,9 +22,9 @@ func (p *StatsHelper) Handle(c *command.Command, s lib.Server) {
 
 	switch c.Argv[0] {
 	case "list":
-		s.Tell(c.Player, command.Text{"现有榜单如下（[榜单代号] 显示名称）：\\n", "yellow"})
+		s.Tell(c.Player, command.Text{"现有榜单如下（[榜单代号] 显示名称）：", "yellow"})
 		for stats := range p.statsmap {
-			s.Tell(c.Player, command.Text{fmt.Sprintf("[%s] %s\\n", stats, p.statsmap[stats]), "yellow"})
+			s.Tell(c.Player, command.Text{fmt.Sprintf("[%s] %s", stats, p.statsmap[stats]), "yellow"})
 		}
 
 	case "set":
