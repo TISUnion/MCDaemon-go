@@ -31,12 +31,17 @@ func (p *StatsHelper) Handle(c *command.Command, s lib.Server) {
 		if len(c.Argv) < 2 {
 			s.Tell(c.Player, command.Text{"请输入榜单代号！", "red"})
 		} else {
-			board, ok := p.statsmap[c.Argv[1]]
-			if ok {
-				s.Execute(fmt.Sprintf("/scoreboard objectives setdisplay sidebar %s", c.Argv[1]))
-				s.Say(command.Text{"榜单已设为 " + board, "yellow"})
+			if c.Argv[1] == "off" {
+				s.Execute(fmt.Sprintf("/scoreboard objectives setdisplay sidebar"))
+				s.Say(command.Text{"榜单已关闭显示", "yellow"})
 			} else {
-				s.Tell(c.Player, command.Text{"请检查输入的榜单代号！", "red"})
+				board, ok := p.statsmap[c.Argv[1]]
+				if ok {
+					s.Execute(fmt.Sprintf("/scoreboard objectives setdisplay sidebar %s", c.Argv[1]))
+					s.Say(command.Text{"榜单已显示为 " + board, "yellow"})
+				} else {
+					s.Tell(c.Player, command.Text{"请检查输入的榜单代号！", "red"})
+				}
 			}
 		}
 
