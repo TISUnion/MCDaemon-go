@@ -24,7 +24,7 @@ func (wp *WarnPlugin) Handle(c *command.Command, s lib.Server) {
 	case "warn":
 		ticks, _ := strconv.Atoi(c.Argv[2])
 		if ticks >= 40 && ticks < 500 {
-			s.Say(command.Text{fmt.Sprintf("嗯？服务姬有点忙不过来了，延迟%dticks~", ticks), "grey"})
+			s.Say(command.Text{fmt.Sprintf("嗯？服务姬有点忙不过来了，延迟%dticks~", ticks), "gray"})
 			s.WriteLog("info", fmt.Sprintf("服务器延迟%dticks", ticks))
 		} else if ticks >= 500 && ticks < 1000 {
 			s.Say(command.Text{fmt.Sprintf("哎呀呀，让服务姬歇一会吧，延迟%dticks！", ticks), "yellow"})
