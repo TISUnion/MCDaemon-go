@@ -1,5 +1,6 @@
 /*
  * 转发服务器警告消息，并在接收到fatal时自动重启服务器进程
+ * author: Sciroccogti
  */
 
 package plugin
