@@ -45,7 +45,7 @@ func (p *StatsHelper) Handle(c *command.Command, s lib.Server) {
 			}
 		}
 
-	case "help":
+	default:
 		list1 := command.Text{"!!stats list", "white"}
 		list2 := command.Text{"列出所有榜单\n", "green"}
 		set1 := command.Text{"!!stats set [榜单代号(英文)]", "white"}
