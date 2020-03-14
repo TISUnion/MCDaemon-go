@@ -60,6 +60,7 @@ func (p *StatsHelper) Init(s lib.Server) {
 	p.statsmap["deathcount"] = "死亡榜"
 	p.statsmap["onlinecount"] = "在线榜"
 	p.statsmap["killcount"] = "杀怪榜"
+	p.statsmap["digcount"] = "挖掘榜"
 	// TODO: 自动获取服务器中的榜单
 }
 
