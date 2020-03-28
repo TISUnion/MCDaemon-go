@@ -25,5 +25,6 @@ func CreatePluginsList(isload bool) (PluginMap, PluginMap) {
 	PluginsList.RegisterPlugin("!!autobk", &AutoBackup{})                // 自动备份插件
 	PluginsList.RegisterPlugin("!!Warn", &WarnPlugin{})                  // 警告信息插件
 	PluginsList.RegisterPlugin("!!stats", &StatsHelper{})                // 榜单信息插件
+	PluginsList.RegisterPlugin("!!here", &HerePlugin{})                  // 坐标广播插件
 	return PluginsList, DisablePluginsList
 }

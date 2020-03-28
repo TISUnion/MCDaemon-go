@@ -12,5 +12,6 @@ func CreateParserList() []lib.Parser {
 		&TpsParser{},
 		&LoginoutParser{},
 		&WarnParser{},
+		&HereParser{},
 	}
 }
