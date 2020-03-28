@@ -29,9 +29,9 @@ func (p *HerePlugin) Handle(c *command.Command, s lib.Server) {
 	} else {
 		switch c.Argv[0] {
 		case "res":
-			if len(c.Argv) == 6 && c.Argv[1] == p.player {
-				posstr := "[x:" + c.Argv[3] + ", y:" + c.Argv[4] + ", z:" + c.Argv[5] + "]"
-				s.Say(command.Text{p.player + "在" + p.dim_convert[c.Argv[2]] + posstr + "向你问好", "green"})
+			if len(c.Argv) == 5 { // && c.Argv[1] == p.player {
+				posstr := "[x:" + c.Argv[2] + ", y:" + c.Argv[3] + ", z:" + c.Argv[4] + "]"
+				s.Say(command.Text{p.player + "在" + p.dim_convert[c.Argv[1]] + posstr + "向你问好", "green"})
 				p.player = ""
 			}
 
