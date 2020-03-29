@@ -1,4 +1,6 @@
 # MCDaemon-go
+[![Go Report Card](https://goreportcard.com/badge/github.com/Dark-Night-Base/MCDaemon-go)](https://goreportcard.com/report/github.com/Dark-Night-Base/MCDaemon-go)
+![Go](https://github.com/Dark-Night-Base/MCDaemon-go/workflows/Go/badge.svg)
 
 ## 用golang实现的Minecraft进程管理程序
 
