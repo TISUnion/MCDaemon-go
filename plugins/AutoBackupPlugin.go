@@ -1,3 +1,5 @@
+// +build darwin linux !windows
+
 /*
  * 自动增量备份插件（仅限Linux，在Ubuntu18.04通过测试）
  * 定时运行：rsync -a --delete minecraft/ back-up/auto
