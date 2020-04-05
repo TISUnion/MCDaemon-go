@@ -10,7 +10,7 @@ import (
 	"MCDaemon-go/lib"
 	"fmt"
 	"strconv"
-	"time"
+	//"time"
 )
 
 type WarnPlugin struct{}
@@ -33,10 +33,10 @@ func (wp *WarnPlugin) Handle(c *command.Command, s lib.Server) {
 			s.Say(command.Text{fmt.Sprintf("呜呜呜，服务姬受不了了！延迟%dticks！", ticks), "red"})
 			s.WriteLog("warn", fmt.Sprintf("服务器延迟%dticks", ticks))
 		} else if ticks >= 100 {
-			s.Say(command.Text{"服务器负载过高！请立即停止活动并尽快下线！10s后自动重启", "red"})
-			s.WriteLog("fatal", fmt.Sprintf("服务器延迟%dticks，即将自动重启", ticks))
-			time.Sleep(time.Second * 10)
-			s.Restart()
+			s.Say(command.Text{"服务器负载过高！请立即停止活动并联系服主！", "red"})
+			s.WriteLog("fatal", fmt.Sprintf("服务器延迟%dticks", ticks))
+			//time.Sleep(time.Second * 10)
+			//s.Restart()
 		}
 	default:
 	}
