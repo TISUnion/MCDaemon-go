@@ -7,6 +7,7 @@ package plugin
 
 import (
 	"MCDaemon-go/command"
+	"MCDaemon-go/config"
 	"MCDaemon-go/lib"
 	"fmt"
 )
@@ -57,11 +58,7 @@ func (p *StatsHelper) Handle(c *command.Command, s lib.Server) {
 
 func (p *StatsHelper) Init(s lib.Server) {
 	p.statsmap = make(map[string]string)
-	p.statsmap["deathcount"] = "死亡榜"
-	p.statsmap["onlinecount"] = "在线榜"
-	p.statsmap["killcount"] = "杀怪榜"
-	p.statsmap["digcount"] = "挖掘榜"
-	// TODO: 自动获取服务器中的榜单
+	p.statsmap = config.GetPluginCfg(false).Section("StatsHelper").KeysHash()
 }
 
 func (p *StatsHelper) Close() {
