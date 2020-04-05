@@ -40,6 +40,7 @@
 - 镜像管理插件：ImagePlugin
 - 加载热插件：hotPlugin
 - 多服务器聊天插件：ChatPlugin
+- 自动冗余增量备份插件：AutoBackupPlugin
 -----
 
 ## 插件编写

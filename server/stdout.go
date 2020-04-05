@@ -38,7 +38,7 @@ func (svr *Server) WaitEndLoading() bool {
 
 //正式运行MCD
 func (svr *Server) Run() {
-	var buffer []byte = make([]byte, 4096)
+	var buffer []byte = make([]byte, 102400)
 	var buffercmd []byte = make([]byte, 4096)
 	cmdin := bufio.NewReader(os.Stdin)
 	go func() {
