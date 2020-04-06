@@ -1,4 +1,6 @@
 # MCDaemon-go
+[![Go Report Card](https://goreportcard.com/badge/github.com/Dark-Night-Base/MCDaemon-go)](https://goreportcard.com/report/github.com/Dark-Night-Base/MCDaemon-go)
+![Go](https://github.com/Dark-Night-Base/MCDaemon-go/workflows/Go/badge.svg)
 
 ## 用golang实现的Minecraft进程管理程序
 
@@ -38,6 +40,11 @@
 - 镜像管理插件：ImagePlugin
 - 加载热插件：hotPlugin
 - 多服务器聊天插件：ChatPlugin
+- 自动冗余增量备份插件：AutoBackupPlugin
+- 坐标广播插件：HerePlugin
+- 统计信息助手插件：StatsHelperPlugin
+- 警告信息转发插件：WarnPlugin
+
 -----
 
 ## 插件编写
